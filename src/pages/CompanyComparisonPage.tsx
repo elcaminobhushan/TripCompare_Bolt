@@ -124,7 +124,7 @@ const CompanyComparisonPage: React.FC = () => {
     
     // Get all unique activities
     const allActivities = allItineraries.reduce((acc, day) => {
-      const dayActivities = day.activities.map(id => getActivityById(id)).filter(Boolean);
+      const dayActivities = day.activities ? day.activities.map(id => getActivityById(id)).filter(Boolean) : [];
       return [...acc, ...dayActivities];
     }, [] as any[]);
     const uniqueActivities = allActivities.filter((activity, index, self) => 
@@ -133,7 +133,7 @@ const CompanyComparisonPage: React.FC = () => {
     
     // Get all unique meals
     const allMeals = allItineraries.reduce((acc, day) => {
-      const dayMeals = day.meals.map(id => getMealById(id)).filter(Boolean);
+      const dayMeals = day.meals ? day.meals.map(id => getMealById(id)).filter(Boolean) : [];
       return [...acc, ...dayMeals];
     }, [] as any[]);
     const uniqueMeals = allMeals.filter((meal, index, self) => 
@@ -415,13 +415,13 @@ const CompanyComparisonPage: React.FC = () => {
                   </td>
                   {companyData.map((company) => (
                     <td key={company.id} className="px-6 py-4">
-                      <div className="space-y-1">
+                      <div className="flex items-center justify-center gap-2">
                         {company.mealsIncluded && (
                           <div className="text-sm capitalize">
                             • Breakfast ({1})
                           </div>
                         )}
-                        {company.mealsIncluded && (
+                        {!company.mealsIncluded && (
                           <span className="text-gray-500 text-sm">No meals included</span>
                         )}
                       </div>
