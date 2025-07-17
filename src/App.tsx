@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { isSupabaseConnected } from './lib/supabase';
 
 // Components
 import Header from './components/layout/Header';
@@ -22,9 +23,23 @@ import AIComparisonPage from './pages/AIComparisonPage';
 import CompanyComparisonPage from './pages/CompanyComparisonPage';
 
 function App() {
+  // Check if Supabase is connected
+  const supabaseConnected = isSupabaseConnected();
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
+      
+      {/* Supabase Connection Warning */}
+      {!supabaseConnected && (
+        <div className="bg-amber-50 border-b border-amber-200 p-3 text-center">
+          <p className="text-amber-800 text-sm">
+            Supabase is not connected. Some features may not work properly. 
+            Please connect to Supabase using the "Connect to Supabase" button in the top right corner.
+          </p>
+        </div>
+      )}
+      
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -41,7 +56,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/seed-database" element={<SeedDatabasePage />} />
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        </Routes>        
       </main>
       <CompareButton />
       <Footer />

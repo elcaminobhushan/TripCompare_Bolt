@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConnected } from '../lib/supabase';
 import type { Package } from '../types';
+import { packages as localPackages } from '../data/packages';
 
 export function usePackages() {
   const [data, setData] = useState<Package[]>([]);
@@ -11,6 +12,13 @@ export function usePackages() {
     async function fetchPackages() {
       try {
         setIsLoading(true);
+        
+        // If Supabase is not connected, use local data
+        if (!isSupabaseConnected()) {
+          setData(localPackages);
+          return;
+        }
+        
         const { data: packages, error } = await supabase
           .from('packages')
           .select(`
@@ -56,6 +64,8 @@ export function usePackages() {
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching packages:', err);
+        // Fallback to local data on error
+        setData(localPackages);
       } finally {
         setIsLoading(false);
       }
@@ -73,9 +83,21 @@ export function usePackage(id: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!id) return;
+    
     async function fetchPackage() {
       try {
         setIsLoading(true);
+        
+        // If Supabase is not connected, use local data
+        if (!isSupabaseConnected()) {
+          const pkg = localPackages.find(p => p.id === id);
+          if (pkg) {
+            setData(pkg);
+          }
+          return;
+        }
+        
         const { data: pkg, error } = await supabase
           .from('packages')
           .select(`

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConnected } from '../lib/supabase';
 import type { Destination } from '../types';
+import { destinations as localDestinations } from '../data/destinations';
 
 export function useDestinations() {
   const [data, setData] = useState<Destination[]>([]);
@@ -11,6 +12,13 @@ export function useDestinations() {
     async function fetchDestinations() {
       try {
         setIsLoading(true);
+        
+        // If Supabase is not connected, use local data
+        if (!isSupabaseConnected()) {
+          setData(localDestinations);
+          return;
+        }
+        
         const { data: destinations, error } = await supabase
           .from('destinations')
           .select('*');
@@ -37,6 +45,8 @@ export function useDestinations() {
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching destinations:', err);
+        // Fallback to local data on error
+        setData(localDestinations);
       } finally {
         setIsLoading(false);
       }
@@ -54,14 +64,24 @@ export function useDestination(_id: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    if (!id) return;
+    
     async function fetchDestination() {
       try {
         setIsLoading(true);
+        
+        // If Supabase is not connected, use local data
+        if (!isSupabaseConnected()) {
+          const destination = localDestinations.find(d => d.id === id);
+          if (destination) {
+            setData(destination);
+          }
+          return;
+        }
+        
         const { data: destination, error } = await supabase
           .from('destinations')
           .select('*')
-          .eq('id', id)
-          .single();
 
         if (error) throw error;
         
