@@ -5,7 +5,7 @@ interface Transport {
   description: string;
 }
 
-const transport: Transport[] = [
+export const transport: Transport[] = [
     {
       id: "trans1",
       type: "flight",
