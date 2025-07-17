@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Star, Clock, Plus, Check, Plane, Hotel, Coffee, MapPin, Download } from 'lucide-react';
-import { Package } from '../../types';
+import { Destination, Package } from '../../types';
 import { useFavoritesStore, useCompareStore } from '../../store/useStore';
 import { formatPrice, calculateFinalPrice } from '../../utils/formatters';
-import { destinations } from '../../data/destinations';
+//import { destinations } from '../../data/destinations';
+import { useDestinations } from '../../hooks/useDestinations'; // adjust path as needed
+
 import { accommodations } from '../../data/accommodations';
 import { tourOperators } from '../../data/tour-operators';
 import { getPackageRating } from '../../data/reviews';
@@ -21,9 +23,13 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
   const addToCompare = useCompareStore((state) => state.addToCompare);
   const removeFromCompare = useCompareStore((state) => state.removeFromCompare);
   const isInCompareList = useCompareStore((state) => state.isInCompareList(packageData.id));
+  
+  const { data: destinations, isLoading, error } = useDestinations();
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
 
   // Get related data
-  const destination = destinations.find(d => d.id === packageData.destinationId);
+  const destination = destinations.find((d: Destination) => d.id === packageData.destinationId);
   const accommodation = accommodations.find(a => a.id === packageData.accommodationId);
   const tourOperator = tourOperators.find(t => t.id === packageData.tourOperatorId);
   const rating = getPackageRating(packageData.id);

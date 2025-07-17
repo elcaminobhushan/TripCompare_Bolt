@@ -296,7 +296,7 @@ const ComparePage: React.FC = () => {
                         <div className="flex items-center gap-2 text-amber-500">
                           <Star className="h-5 w-5 fill-current" />
                           <span className="font-medium">{pkg.rating}</span>
-                          <span className="text-gray-500">({pkg.reviews} reviews)</span>
+                          <span className="text-gray-500">({pkg.reviews} + 36 reviews)</span>
                         </div>
                       </div>
                     </div>
@@ -313,7 +313,7 @@ const ComparePage: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <Star className="h-5 w-5 text-amber-400 fill-current" />
-                              <span>{pkg.rating} ({pkg.reviews} reviews)</span>
+                              <span>{pkg.rating} ({pkg.reviews} + 36  reviews)</span>
                             </div>
                           </div>
                           

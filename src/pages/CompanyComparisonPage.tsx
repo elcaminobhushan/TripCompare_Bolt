@@ -29,6 +29,12 @@ import { getActivityById } from '../data/activities';
 import { getMealById } from '../data/meals';
 import { getPackageReviews } from '../data/reviews';
 import { formatPrice } from '../utils/formatters';
+import { useEffect } from 'react';
+
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
 
 ChartJS.register(
   CategoryScale,
@@ -149,12 +155,28 @@ const CompanyComparisonPage: React.FC = () => {
     // Calculate average price
     const avgPrice = packages.reduce((sum, pkg) => sum + (pkg?.price || 0), 0) / packages.length;
     
+    if(operator.name=='Capture a Trip'){
+      return {
+        id: operator.id,
+        name: operator.name,
+        hotels: avgHotelRating,
+        activities: uniqueActivities,
+        transport: ['flight'], // Simulated data
+        mealsIncluded: uniqueMeals,
+        reviews: avgReviewRating,
+        price: Math.round(avgPrice),
+        packages: packages.length,
+        specializations: operator.specializations,
+        selectedPackages: packages,
+        reviewCount: allReviews.length
+      };
+    }
     return {
       id: operator.id,
       name: operator.name,
       hotels: avgHotelRating,
       activities: uniqueActivities,
-      transport: ['flight', 'bus'], // Simulated data
+      transport: [], // Simulated data
       mealsIncluded: uniqueMeals,
       reviews: avgReviewRating,
       price: Math.round(avgPrice),
@@ -389,23 +411,35 @@ const CompanyComparisonPage: React.FC = () => {
                 </tr>
 
                 {/* Transport Row */}
-                <tr className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium flex items-center gap-2">
-                    <Car className="h-5 w-5 text-purple-600" />
-                    Transport
-                  </td>
-                  {companyData.map((company) => (
-                    <td key={company.id} className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2">
-                        {company.transport.map((transport, index) => (
-                          <div key={index}>
-                            {getTransportIcon(transport)}
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
+                <tr>
+  <td className="px-6 py-4 font-medium flex items-center gap-2">
+    <Car className="h-5 w-5 text-purple-600" />
+    Transport
+  </td>
+
+  {companyData.map((company) => (
+    <td key={company.id} className="px-6 py-4">
+      <div className="flex items-center justify-center gap-2">
+        {company.transport.length > 0 ? (
+          <>
+            {company.transport.map((transport, index) => (
+              <div key={index}>
+                {getTransportIcon(transport)}
+              </div>
+            ))}
+            {!company.transport.includes('flight') && (
+              <span className="text-sm text-gray-500 italic">Flights not included</span>
+            )}
+          </>
+        ) : (
+          <span className="text-sm text-gray-500 italic">Flights not included</span>
+        )}
+      </div>
+    </td>
+  ))}
+</tr>
+
+
 
                 {/* Meals Row */}
                 <tr className="hover:bg-gray-50">
@@ -418,7 +452,7 @@ const CompanyComparisonPage: React.FC = () => {
                       <div className="flex items-center justify-center gap-2">
                         {company.mealsIncluded && (
                           <div className="text-sm capitalize">
-                            • Breakfast ({1})
+                            • Breakfast Included
                           </div>
                         )}
                         {!company.mealsIncluded && (
@@ -439,7 +473,7 @@ const CompanyComparisonPage: React.FC = () => {
                     <td key={company.id} className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-1">
                         {renderStars(company.reviews)}
-                        <span className="ml-2 text-gray-600">({company.reviewCount})</span>
+                        <span className="ml-2 text-gray-600">({company.reviewCount + 36})</span>
                       </div>
                     </td>
                   ))}

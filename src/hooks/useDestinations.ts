@@ -64,7 +64,8 @@ export function useDestination(_id: string) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!_id) return;
+
     
     async function fetchDestination() {
       try {
@@ -72,7 +73,7 @@ export function useDestination(_id: string) {
         
         // If Supabase is not connected, use local data
         if (!isSupabaseConnected()) {
-          const destination = localDestinations.find(d => d.id === id);
+          const destination = localDestinations.find(d => d.id === _id);
           if (destination) {
             setData(destination);
           }
@@ -81,7 +82,8 @@ export function useDestination(_id: string) {
         
         const { data: destination, error } = await supabase
           .from('destinations')
-          .select('*')
+          .select('*').eq('id', _id)
+          .single();
 
         if (error) throw error;
         
@@ -110,10 +112,10 @@ export function useDestination(_id: string) {
       }
     }
 
-    if (id) {
+    if (_id) {
       fetchDestination();
     }
-  }, [id]);
+  }, [_id]);
 
   return { data, isLoading, error };
 }
@@ -131,7 +133,7 @@ export function usePopularDestinations(_limit: number = 6) {
           .from('destinations')
           .select('*')
           .order('searches', { ascending: false })
-          .limit(limit);
+          .limit(_limit);
 
         if (error) throw error;
         
@@ -161,7 +163,7 @@ export function usePopularDestinations(_limit: number = 6) {
     }
 
     fetchPopularDestinations();
-  }, [limit]);
+  }, [_limit]);
 
   return { data, isLoading, error };
 }

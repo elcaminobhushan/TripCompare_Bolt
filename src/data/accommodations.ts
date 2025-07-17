@@ -14,7 +14,17 @@ export const accommodations: Accommodation[] = [
     id: "acc1",
     name: "Oceanic Paradise Resort & Spa",
     type: "5-Star Resort",
-    rating: 5,
+    rating: 4,
+    amenities: ["Beachfront", "Pool", "Spa", "4 Restaurants", "Bar", "Fitness Center"],
+    image: "https://images.pexels.com/photos/189296/pexels-photo-189296.jpeg",
+    location: "Bali",
+    description: "Luxury beachfront resort with world-class amenities and stunning ocean views."
+  },
+  {
+    id: "acc2",
+    name: "Oceanic Paradise Resort & Spa",
+    type: "5-Star Resort",
+    rating: 3,
     amenities: ["Beachfront", "Pool", "Spa", "4 Restaurants", "Bar", "Fitness Center"],
     image: "https://images.pexels.com/photos/189296/pexels-photo-189296.jpeg",
     location: "Bali",
