@@ -31,10 +31,6 @@ import { getPackageReviews } from '../data/reviews';
 import { formatPrice } from '../utils/formatters';
 import { useEffect } from 'react';
 
-useEffect(() => {
-  window.scrollTo(0, 0);
-}, []);
-
 
 ChartJS.register(
   CategoryScale,
@@ -53,6 +49,9 @@ ChartJS.register(
 
 const CompanyComparisonPage: React.FC = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const compareList = useCompareStore((state) => state.compareList);
   const [activeChart, setActiveChart] = useState<'bar' | 'radar' | 'doughnut'>('bar');
 
