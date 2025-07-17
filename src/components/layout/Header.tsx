@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart } from 'lucide-react';
+import { Menu, X, Heart, LogIn } from 'lucide-react';
 import { useFavoritesStore } from '../../store/useStore';
+import { supabase } from '../../lib/supabase';
 import logo from '../images/logo_only.png'; // adjust path if needed
 
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const location = useLocation();
   const favorites = useFavoritesStore((state) => state.favorites);
 
@@ -21,8 +23,28 @@ const Header: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Check for current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     setIsMenuOpen(false);
   }, [location]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
     <header 
@@ -97,6 +119,25 @@ const Header: React.FC = () => {
 
           {/* Right Actions */}
           <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-700">{user.email}</span>
+                <button 
+                  onClick={handleSignOut}
+                  className="text-gray-700 hover:text-primary-600 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <Link 
+                to="/login" 
+                className="flex items-center gap-1 text-gray-700 hover:text-primary-600 transition-colors"
+              >
+                <LogIn className="h-5 w-5" />
+                <span>Sign In</span>
+              </Link>
+            )}
             <Link 
               to="/favorites" 
               className="flex items-center gap-1 text-gray-700 hover:text-primary-600 transition-colors"
@@ -113,6 +154,7 @@ const Header: React.FC = () => {
               Find Packages
             </Link>
           </div>
+          </Link>
 
           {/* Mobile Menu Button */}
           <button 
@@ -205,6 +247,34 @@ const Header: React.FC = () => {
               Favorites {favorites.length > 0 && `(${favorites.length})`}
             </Link>
           </nav>
+          {user ? (
+            <div className="border-t border-gray-200 pt-4 mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600">
+                  {user.email.charAt(0).toUpperCase()}
+                </div>
+                <div className="text-sm">
+                  <div className="font-medium">{user.email}</div>
+                </div>
+              </div>
+              <button 
+                onClick={handleSignOut}
+                className="w-full text-left p-2 text-gray-700 hover:bg-gray-50 rounded-lg"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="border-t border-gray-200 pt-4 mt-4">
+              <Link 
+                to="/login"
+                className="flex items-center gap-2 p-2 text-gray-700 hover:bg-gray-50 rounded-lg"
+              >
+                <LogIn className="h-5 w-5" />
+                <span>Sign In</span>
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </header>

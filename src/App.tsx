@@ -4,6 +4,8 @@ import { Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import CompareButton from './components/layout/CompareButton';
+import LoginPage from './pages/LoginPage';
+import SeedDatabasePage from './pages/SeedDatabasePage';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -36,6 +38,8 @@ function App() {
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/ai-comparison" element={<AIComparisonPage />} />
           <Route path="/company-comparison" element={<CompanyComparisonPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/seed-database" element={<SeedDatabasePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
