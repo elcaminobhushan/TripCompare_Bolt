@@ -154,7 +154,6 @@ const Header: React.FC = () => {
               Find Packages
             </Link>
           </div>
-          </Link>
 
           {/* Mobile Menu Button */}
           <button 
