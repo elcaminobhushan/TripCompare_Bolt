@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { packages } from '../data/packages';
-import { destinations } from '../data/destinations';
+import { useDestinations } from '@/hooks/useDestinations';
 import { Package } from '../types';
 import { useCompare } from '../hooks/useCompare';
 
@@ -24,12 +24,13 @@ interface FilterState {
   inclusions: string[];
 }
 
-const trendingDestinations = (destinations || []).filter(dest => dest?.trending === true);
 
 
 
 const PackageListingPage: React.FC = () => {
   const location = useLocation();
+  const { data: destinations, isLoading } = useDestinations();
+  const trendingDestinations = (destinations || []).filter(dest => dest?.trending === true);
   const [activeDestinationId, setActiveDestinationId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -122,6 +123,7 @@ const PackageListingPage: React.FC = () => {
 
   const sortedPackages = sortPackages(filteredPackages);
 
+  if (isLoading) return <p>Loading destinations...</p>;
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Bar */}

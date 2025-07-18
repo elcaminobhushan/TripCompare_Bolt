@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { destinations } from '../data/destinations';
 import { Sun, Cloud, Plane, DollarSign } from 'lucide-react';
 import { packages } from '../data/packages';
+import { useDestinations } from '@/hooks/useDestinations';
 
 const DestinationsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,6 +26,10 @@ const DestinationsPage: React.FC = () => {
   const handleViewPackages = (destinationId: string) => {
     navigate(`/packages?destination=${encodeURIComponent(destinationId)}`);
   };
+  
+  const { data: destinations, isLoading, error } = useDestinations();
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

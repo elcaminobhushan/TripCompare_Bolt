@@ -3,7 +3,7 @@ import { Package } from '../../types';
 import { X, Star, Check } from 'lucide-react';
 import { useCompare } from '../../hooks/useCompare';
 import { formatPrice, calculateFinalPrice } from '../../utils/formatters';
-import { destinations } from '../../data/destinations';
+import { useDestinations } from '@/hooks/useDestinations';
 import { getPackageItinerary } from '../../data/itineraries';
 import { getMealById } from '../../data/meals';
 import { getAccommodationById } from '../../data/accommodations';
@@ -15,6 +15,9 @@ interface CompareTableProps {
 
 const CompareTable: React.FC<CompareTableProps> = ({ packages }) => {
   const { removeFromCompare } = useCompare();
+  const { data: destinations, isLoading, error } = useDestinations();
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
 
   if (packages.length === 0) {
     return (

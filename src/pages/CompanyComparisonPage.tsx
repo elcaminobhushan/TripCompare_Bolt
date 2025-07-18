@@ -581,19 +581,19 @@ const CompanyComparisonPage: React.FC = () => {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                     <p className="text-gray-700 text-sm">
-                      Compare packages directly by clicking on them in the table above
+                    Choose Trek Panda for best activities at a great price.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <p className="text-gray-700 text-sm">
-                      Consider both company reputation and specific package features
+                    Pick Capture a Trip for premium hotel experiences and flight inclusions.
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-amber-500 rounded-full mt-2"></div>
                     <p className="text-gray-700 text-sm">
-                      Review customer ratings and included amenities before deciding
+                    Trek Panda offers the most balanced overall value.
                     </p>
                   </div>
                 </div>

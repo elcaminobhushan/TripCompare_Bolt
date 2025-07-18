@@ -34,6 +34,8 @@ export interface Destination {
   languages: string[];
   currency: string;
   timeZone: string;
+  trending: boolean;
+  searches: number;
 }
 
 export interface TourOperator {

@@ -1,10 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { destinations } from '../../data/destinations';
+import { useDestinations } from '@/hooks/useDestinations';
 
 const FeaturedDestinations: React.FC = () => {
   const navigate = useNavigate();
+
+  const { data: destinations, isLoading, error } = useDestinations();
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
+
   const featuredDestinations = destinations.slice(0, 6);
 
   const handleDestinationClick = (destinationName: string) => {

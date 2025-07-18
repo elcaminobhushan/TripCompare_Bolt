@@ -10,9 +10,9 @@ import Reviews from './Reviews';
 import Policies from './Policies';
 import { Package } from '../../../types';
 import { useFavoritesStore } from '../../../store/useStore';
-import { destinations } from '../../../data/destinations';
 import { getPackageReviews } from '../../../data/reviews';
 import { tourOperators } from '../../../data/tour-operators';
+import { useDestinations } from '@/hooks/useDestinations';
 
 interface PackageDetailsProps {
   packageData: Package;
@@ -26,6 +26,11 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
 
   const finalPrice = calculateFinalPrice(packageData);
   const savedAmount = packageData.price - finalPrice;
+
+  const { data: destinations, isLoading, error } = useDestinations();
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
+
   const destination = destinations.find((d: any) => d.id === packageData.destinationId);
   const reviews = getPackageReviews(packageData.id);
   const tourOperator = tourOperators.find((to: any) => to.id === packageData.tourOperatorId);

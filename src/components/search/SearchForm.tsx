@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Sparkles, Globe, Navigation } from 'lucide-react';
-import { destinations } from '../../data/destinations';
+import { useDestinations } from '@/hooks/useDestinations';
 
 interface SearchFormProps {
   onSearch: (searchParams: any) => void;
@@ -17,6 +17,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
   const [showAIRecommendations, setShowAIRecommendations] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { data: destinations, error } = useDestinations();
+if (error) return <p>Error loading destinations</p>;
   // Simulated AI recommendations
   const aiRecommendations = [
     { name: "Bali", reason: "Based on your interest in beach destinations" },
