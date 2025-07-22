@@ -20,17 +20,13 @@ export function usePackages() {
         }
         
         const { data: packages, error } = await supabase
-          .from('packages')
-          .select(`
-            *,
-            destination:destinations(*),
-            accommodation:accommodations(*),
-            tour_operator:tour_operators(*),
-            inclusions:package_inclusions(description),
-            exclusions:package_exclusions(description),
-            tags:package_tags(tag),
-            transports:package_transports(transport:transports(*))
-          `);
+        .from('packages')
+        .select(`
+          *,
+          tour_operator:tour_operators(*),
+          destination:destinations(*)
+        `);
+
 
         if (error) throw error;
         

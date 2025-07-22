@@ -39,7 +39,7 @@ export function useTourOperators() {
           certifications: op.certifications
         }));
 
-        setData(transformedOperators);
+          setData(transformedOperators);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching tour operators:', err);

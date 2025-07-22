@@ -11,14 +11,15 @@ import Policies from './Policies';
 import { Package } from '../../../types';
 import { useFavoritesStore } from '../../../store/useStore';
 import { getPackageRating, getPackageReviews } from '../../../data/reviews';
-import { tourOperators } from '../../../data/tour-operators';
 import { useDestinations } from '@/hooks/useDestinations';
+import { useTourOperators } from '@/hooks/useTourOperators';
 
 interface PackageDetailsProps {
   packageData: Package;
 }
 
 const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
+  const { data: tourOperators,isLoading} = useTourOperators();
   const [activeTab, setActiveTab] = useState('overview');
   const [isContactFormOpen, setIsContactFormOpen] = useState(false);
   const { isFavorite, toggleFavorite } = useFavoritesStore();
@@ -27,15 +28,16 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
   const finalPrice = calculateFinalPrice(packageData);
   const savedAmount = packageData.price - finalPrice;
 
-  const { data: destinations, isLoading, error } = useDestinations();
-  if (isLoading) return <p>Loading destinations...</p>;
-  if (error) return <p>Error loading destinations</p>;
+  const { data: destinations, error } = useDestinations();
+
 
   const destination = destinations.find((d: any) => d.id === packageData.destinationId);
   const ratings = getPackageRating(packageData.id);
   const reveiws = getPackageReviews(packageData.id);
   const tourOperator = tourOperators.find((to: any) => to.id === packageData.tourOperatorId);
 
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
   const handleFavoriteClick = () => {
     toggleFavorite(packageData.id);
   };

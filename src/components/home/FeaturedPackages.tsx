@@ -1,11 +1,14 @@
 import React from 'react';
 import { Package } from '../../types';
 import PackageCard from '../package/PackageCard';
-import { packages } from '../../data/packages';
+import {usePackages} from '../../hooks/usePackages';
 
 const FeaturedPackages: React.FC = () => {
   // Filter featured packages
+  const { data: packages,isLoading} = usePackages();
   const featuredPackages: Package[] = packages.filter(pkg => pkg.featured);
+  
+if (isLoading) return <p>Loading...</p>;
   
   return (
     <section className="py-16">
