@@ -5,11 +5,11 @@ import { Destination, Package } from '../../types';
 import { useFavoritesStore, useCompareStore } from '../../store/useStore';
 import { formatPrice, calculateFinalPrice } from '../../utils/formatters';
 //import { destinations } from '../../data/destinations';
-import { useDestinations } from '../../hooks/useDestinations'; // adjust path as needed
-
-import { accommodations } from '../../data/accommodations';
+import { useDestinations } from '../../hooks/useDestinations'; 
 import { tourOperators } from '../../data/tour-operators';
 import { getPackageRating } from '../../data/reviews';
+import { getAccommodationByPackageId } from '../../data/accommodations';
+import {getTransportByPackageId} from '../../data/transport';
 
 interface PackageCardProps {
   packageData: Package;
@@ -30,9 +30,10 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
 
   // Get related data
   const destination = destinations.find((d: Destination) => d.id === packageData.destinationId);
-  const accommodation = accommodations.find(a => a.id === packageData.accommodationId);
+  const accommodation = getAccommodationByPackageId(packageData.id);
   const tourOperator = tourOperators.find(t => t.id === packageData.tourOperatorId);
   const rating = getPackageRating(packageData.id);
+  const transports = getTransportByPackageId(packageData.id);
   
   const handleCompareClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -55,15 +56,15 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
   };
 
   const handleDownloadClick = () => {
-    if (!packageData.itinerary) {
+    if (!packageData.itineraryPdf) {
       alert("No itinerary file specified.");
       return;
     }
   
-    const fileUrl = `/itenaries/${packageData.itinerary}`;
+    const fileUrl = `/itenaries/${packageData.itineraryPdf}`;
     const link = document.createElement("a");
     link.href = fileUrl;
-    link.download = packageData.itinerary;
+    link.download = packageData.itineraryPdf;
     link.target = "_blank"; // Optional: open in new tab
     document.body.appendChild(link);
     link.click();
@@ -91,7 +92,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
     >
       <div className="relative">
         <img 
-          src={packageData.image} 
+          src={packageData.mainImage} 
           alt={packageData.title}
           className="h-48 w-full object-cover"
         />
@@ -150,18 +151,19 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
           </div>
           
           <div className="flex flex-wrap gap-2 mb-3">
-            {packageData.transportIds.length > 0 && (
+            {transports && transports?.length> 0  && transports.filter(a => a.type === 'flight')&& (
               <span className="badge bg-primary-50 text-primary-600 flex items-center">
                 <Plane className="h-3 w-3 mr-1" />
                 Transport
               </span>
             )}
-            {accommodation && (
+            {accommodation && accommodation.length > 0 && (
               <span className="badge bg-primary-50 text-primary-600 flex items-center">
                 <Hotel className="h-3 w-3 mr-1" />
-                {accommodation.type}
+                {Math.max(...accommodation.map(a => a.rating))} ★
               </span>
             )}
+
             {packageData.inclusions.some(i => i.toLowerCase().includes('breakfast')) && (
               <span className="badge bg-primary-50 text-primary-600 flex items-center">
                 <Coffee className="h-3 w-3 mr-1" />

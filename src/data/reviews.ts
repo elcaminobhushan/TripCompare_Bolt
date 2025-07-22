@@ -15,7 +15,6 @@ export const reviews: PackageReview[] = [
     date: "2024-05-12",
     likes: 42,
     imageIds: ["img1"],
-    tagIds: ["tag-party", "tag-islands"],
     verified: true,
     response: {
       from: "TripCompare Team",
@@ -32,7 +31,6 @@ export const reviews: PackageReview[] = [
     content: "It was my first time doing a group tour. The trip captain was awesome and took care of everything. Just wish we had more time at Koh Samui.",
     date: "2024-05-08",
     likes: 19,
-    tagIds: ["tag-group", "tag-thailand"],
     verified: true
   },
   {
@@ -45,7 +43,6 @@ export const reviews: PackageReview[] = [
     date: "2024-05-02",
     likes: 33,
     imageIds: ["img2"],
-    tagIds: ["tag-beach", "tag-solo"],
     verified: true
   },
   {
@@ -58,7 +55,6 @@ export const reviews: PackageReview[] = [
     date: "2024-05-02",
     likes: 3,
     imageIds: ["img7"],
-    tagIds: ["tag-beach", "tag-solo"],
     verified: true
   },
 

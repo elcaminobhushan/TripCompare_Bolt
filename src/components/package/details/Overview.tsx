@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Package } from '../../../types';
 import { ChevronDown, Activity, BedDouble, Plane, Utensils } from 'lucide-react';
 import { getPackageItinerary } from '../../../data/itineraries';
-import { getActivityById } from '../../../data/activities';
-import { getMealById } from '../../../data/meals';
-import { getAccommodationById } from '../../../data/accommodations';
-import { getTransportById } from '../../../data/transport';
+
+import { getActivitiesByItenaryId } from '../../../data/activities';
+import { getAccommodationByItenaryId } from '../../../data/accommodations';
+import { getTransportByItenaryId } from '../../../data/transport';
 
 interface OverviewProps {
   packageData: Package;
@@ -26,10 +26,10 @@ const Overview: React.FC<OverviewProps> = ({ packageData }) => {
   return (
     <div className="space-y-6">
       {itinerary.map((day) => {
-        const activities = (day.activities ?? []).map(id => getActivityById(id)).filter(Boolean);
-        const meals = (day.meals ?? []).map(id => getMealById(id)).filter(Boolean);
-        const accommodation = day.accommodation? getAccommodationById(day.accommodation) : null;
-        const transports = day.transport?.map(id => getTransportById(id)).filter(Boolean) || [];
+        const activities = getActivitiesByItenaryId(day.id);
+        const meals = packageData.meal;
+        const accommodation = getAccommodationByItenaryId(day.id);
+        const transports = getTransportByItenaryId(day.id);
         
         return (
           <div 
@@ -65,7 +65,7 @@ const Overview: React.FC<OverviewProps> = ({ packageData }) => {
                 </div>
                 
                 {/* Activities */}
-                {activities.length > 0 && (
+                {activities && activities.length > 0 && (
                   <div className="mb-8">
                     <h4 className="font-medium text-gray-900 mb-4">Activities</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -85,65 +85,76 @@ const Overview: React.FC<OverviewProps> = ({ packageData }) => {
                 )}
                 
                 {/* Accommodation */}
-                {accommodation && (
-                  <div className="mb-8">
-                    <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
-                      <BedDouble className="h-5 w-5 text-primary-600" />
-                      Accommodation
-                    </h4>
-                    <div className="bg-gray-50 rounded-lg p-4">
+                {accommodation && accommodation.length > 0 && (
+                <div className="mb-8">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+                    <BedDouble className="h-5 w-5 text-primary-600" />
+                    Accommodation
+                  </h4>
+
+                  {accommodation.map((acc) => (
+                    <div key={acc.id} className="bg-gray-50 rounded-lg p-4 mb-4">
                       <div className="flex gap-4">
-                        <img 
-                          src={accommodation.image}
-                          alt={accommodation.name}
+                        <img
+                          src={acc.image}
+                          alt={acc.name}
                           className="w-32 h-24 rounded-lg object-cover"
                         />
                         <div>
-                          <h5 className="font-medium">{accommodation.name}</h5>
-                          <p className="text-gray-600">{accommodation.type}</p>
+                          <h5 className="font-medium">{acc.name}</h5>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
+              )}
+
                 
                 {/* Transportation */}
-                {transports.length > 0 && (
+                {transports && transports.length > 0 && (
                   <div className="mb-8">
                     <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
                       <Plane className="h-5 w-5 text-primary-600" />
                       Transportation
                     </h4>
-                    <div className="bg-gray-50 rounded-lg p-4">
+
+                    <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                       {transports.map((transport) => (
-                        <div key={transport?.id}>
-                          <h5 className="font-medium">{transport?.name}</h5>
-                          <p className="text-gray-600">{transport?.description}</p>
-                        </div>
+                        transport && (
+                          <div key={transport.id}>
+                            <h5 className="font-medium">{transport.name}</h5>
+                            {transport.description && (
+                              <p className="text-gray-600">{transport.description}</p>
+                            )}
+                          </div>
+                        )
                       ))}
                     </div>
                   </div>
                 )}
+
                 
                 {/* Meals */}
-                {meals.length > 0 && (
+                {meals && meals.length > 0 && (
                   <div>
                     <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
                       <Utensils className="h-5 w-5 text-primary-600" />
                       Included Meals
                     </h4>
-                    <div className="flex gap-3">
-                      {meals.map((meal) => (
-                        <span 
-                          key={meal?.id}
+                    <div className="flex gap-3 flex-wrap">
+                      {meals.map((meal, index) => (
+                        <span
+                          key={index}
                           className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-sm font-medium capitalize"
                         >
-                          {meal?.type}
+                          {meal}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
+
+
               </div>
             )}
           </div>

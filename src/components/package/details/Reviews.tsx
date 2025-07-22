@@ -92,20 +92,6 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews }) => {
               </div>
             )}
 
-            {/* Tags */}
-            {review.tagIds && review.tagIds.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {review.tagIds.map((tagId) => (
-                  <span
-                    key={tagId}
-                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
-                  >
-                    {tagId}
-                  </span>
-                ))}
-              </div>
-            )}
-
             {/* Review Actions */}
             <div className="flex items-center gap-4 text-gray-600">
               <button className="flex items-center gap-1 hover:text-gray-900">

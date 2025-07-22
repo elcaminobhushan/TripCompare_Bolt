@@ -10,7 +10,7 @@ import Reviews from './Reviews';
 import Policies from './Policies';
 import { Package } from '../../../types';
 import { useFavoritesStore } from '../../../store/useStore';
-import { getPackageReviews } from '../../../data/reviews';
+import { getPackageRating, getPackageReviews } from '../../../data/reviews';
 import { tourOperators } from '../../../data/tour-operators';
 import { useDestinations } from '@/hooks/useDestinations';
 
@@ -32,7 +32,8 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
   if (error) return <p>Error loading destinations</p>;
 
   const destination = destinations.find((d: any) => d.id === packageData.destinationId);
-  const reviews = getPackageReviews(packageData.id);
+  const ratings = getPackageRating(packageData.id);
+  const reveiws = getPackageReviews(packageData.id);
   const tourOperator = tourOperators.find((to: any) => to.id === packageData.tourOperatorId);
 
   const handleFavoriteClick = () => {
@@ -40,15 +41,15 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
   };
 
   const handleDownloadClick = () => {
-    if (!packageData.itinerary) {
+    if (!packageData.itineraryPdf) {
       alert("No itinerary file specified.");
       return;
     }
   
-    const fileUrl = `/itenaries/${packageData.itinerary}`;
+    const fileUrl = `/itenaries/${packageData.itineraryPdf}`;
     const link = document.createElement("a");
     link.href = fileUrl;
-    link.download = packageData.itinerary;
+    link.download = packageData.itineraryPdf;
     link.target = "_blank"; // Optional: open in new tab
     document.body.appendChild(link);
     link.click();
@@ -68,12 +69,11 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
                   <MapPin className="h-5 w-5" />
                   <span>{destination?.name}, {destination?.country}</span>
                 </div>
-                
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
-                    <span className="font-medium">{packageData.rating}</span>
-                    <span className="text-gray-500">({reviews.length} reviews)</span>
+                    <span className="font-medium">{ratings.rating}</span>
+                    <span className="text-gray-500">({ratings.count} reviews)</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-5 w-5 text-gray-500" />
@@ -85,7 +85,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
                 {/* Main Image */}
                 <div className="aspect-video rounded-xl overflow-hidden">
                   <img 
-                    src={packageData.image} 
+                    src={packageData.mainImage} 
                     alt={packageData.title}
                     className="w-full h-full object-cover"
                   />
@@ -273,7 +273,7 @@ const PackageDetails: React.FC<PackageDetailsProps> = ({ packageData }) => {
               {activeTab === 'stays' && <Stays packageData={packageData} />}
               {activeTab === 'activities' && <Activities packageData={packageData} />}
               {activeTab === 'transport' && <Transport packageData={packageData} />}
-              {activeTab === 'reviews' && <Reviews reviews={reviews} />}
+              {activeTab === 'reviews' && <Reviews reviews={reveiws} />}
               {activeTab === 'policies' && <Policies packageId={packageData.id} />}
             </div>
           </div>

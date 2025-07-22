@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Package } from '../../../types';
-import { ChevronDown, ChevronUp, Activity } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getPackageItinerary } from '../../../data/itineraries';
-import { getActivityById } from '../../../data/activities';
+import { getActivitiesByItenaryId } from '../../../data/activities';
 
 interface ActivitiesProps {
   packageData: Package;
@@ -23,7 +23,7 @@ const Activities: React.FC<ActivitiesProps> = ({ packageData }) => {
   return (
     <div className="space-y-6">
       {itinerary.map((day) => {
-        const activities = (day.activities ?? []).map(id => getActivityById(id)).filter(Boolean);
+        const activities = getActivitiesByItenaryId(day.id);
         
         return (
           <div 
@@ -41,7 +41,7 @@ const Activities: React.FC<ActivitiesProps> = ({ packageData }) => {
                 <div className="text-left">
                   <h3 className="font-semibold">{day.title}</h3>
                   <p className="text-sm text-gray-500">
-                    {activities.length} activities planned
+                    {activities && activities.length} activities planned
                   </p>
                 </div>
               </div>
@@ -52,10 +52,10 @@ const Activities: React.FC<ActivitiesProps> = ({ packageData }) => {
               )}
             </button>
             
-            {expandedDays.includes(day.day) && activities.length > 0 && (
+            {expandedDays.includes(day.day) && activities && activities.length>0 && activities.length > 0 && (
               <div className="p-4 bg-gray-50 border-t border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {activities.map((activity) => (
+                  {activities && activities.length> 0  && activities.map((activity) => (
                     <div
                       key={activity?.id}
                       className="bg-white rounded-lg overflow-hidden"
@@ -67,28 +67,7 @@ const Activities: React.FC<ActivitiesProps> = ({ packageData }) => {
                           className="w-full h-48 object-cover"
                         />
                       )}
-                      <div className="p-4">
-                        <div className="flex items-start gap-3">
-                          <Activity className="h-5 w-5 text-primary-600 mt-1" />
-                          <div>
-                            <h4 className="font-medium">{activity?.name}</h4>
-                            <p className="text-sm text-gray-500">{activity?.description}</p>
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                                {activity?.duration} hours
-                              </span>
-                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded capitalize">
-                                {activity?.difficulty}
-                              </span>
-                              {activity?.included && (
-                                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
-                                  Included
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+
                     </div>
                   ))}
                 </div>

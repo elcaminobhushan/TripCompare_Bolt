@@ -5,7 +5,6 @@ import { accommodations } from './accommodations';
 import { packages } from './packages';
 import { activities } from './activities';
 import { transport } from './transport';
-import { meals } from './meals';
 import { itineraries } from './itineraries';
 import { reviews } from './reviews';
 

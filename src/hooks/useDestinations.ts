@@ -3,6 +3,7 @@ import { supabase, isSupabaseConnected } from '../lib/supabase';
 import type { Destination } from '../types';
 import { destinations as localDestinations } from '../data/destinations';
 
+
 export function useDestinations() {
   const [data, setData] = useState<Destination[]>([]);
   const [isLoading, setIsLoading] = useState(true);

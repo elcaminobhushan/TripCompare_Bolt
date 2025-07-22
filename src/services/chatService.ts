@@ -1,8 +1,7 @@
 import { ChatResponseData } from '../types/chat';
 import { getPackageById } from '../data/packages';
 import { getPackageItinerary } from '../data/itineraries';
-import { getAccommodationById } from '../data/accommodations';
-import { getActivityById } from '../data/activities';
+import { getAccommodationById, getAccommodationByPackageId } from '../data/accommodations';
 import { getTransportById } from '../data/transport';
 import { formatPrice } from '../utils/formatters';
 
@@ -35,10 +34,7 @@ export const processUserInput = (input: string): ChatResponseData => {
     itinerary: getPackageItinerary(firstPackage.id),
     accommodation: firstPackage.accommodationId ? getAccommodationById(firstPackage.accommodationId) : null,
     transport: firstPackage.transportIds?.map((id: string) => getTransportById(id)).filter(Boolean) || [],
-    activities: getPackageItinerary(firstPackage.id)?.reduce((acc: any[], day) => {
-      const dayActivities = ( day.activities ?? []).map(id => getActivityById(id)).filter(Boolean);
-      return [...acc, ...dayActivities];
-    }, []) || []
+    activities:  getAccommodationByPackageId(firstPackage.id) || []
   } : null;
 
   // Normalize input

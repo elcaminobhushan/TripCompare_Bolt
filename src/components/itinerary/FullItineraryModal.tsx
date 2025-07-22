@@ -3,9 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Calendar } from 'lucide-react';
 import { Package } from '../../types';
 import { getPackageItinerary } from '../../data/itineraries';
-import { getActivityById } from '../../data/activities';
-import { getAccommodationById } from '../../data/accommodations';
-import { getTransportById } from '../../data/transport';
+import { getActivitiesByPackageId } from '../../data/activities';
+import { getAccommodationByItenaryId } from '../../data/accommodations';
+import { getTransportByItenaryId } from '../../data/transport';
 
 interface FullItineraryModalProps {
   isOpen: boolean;
@@ -64,11 +64,16 @@ const FullItineraryModal: React.FC<FullItineraryModalProps> = ({ isOpen, onClose
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-12">
-                {itinerary.map((day) => (
+            <div className="space-y-12">
+              {itinerary.map((day) => {
+                const activities = getActivitiesByPackageId(day.id);
+                const transport = getTransportByItenaryId(day.id);
+                const accommodations = getAccommodationByItenaryId(day.id);
+
+                return (
                   <div key={day.id} className="space-y-6">
                     <h3 className="text-xl font-semibold">Day {day.day}</h3>
-                    
+
                     {/* Overview */}
                     <div className="bg-white rounded-xl p-6 border border-gray-200">
                       <h4 className="font-medium mb-2">{day.title}</h4>
@@ -76,60 +81,61 @@ const FullItineraryModal: React.FC<FullItineraryModalProps> = ({ isOpen, onClose
                     </div>
 
                     {/* Activities */}
-                    {day.activities && day.activities.length > 0 && (
+                    {activities && activities.length > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-medium">Activities</h4>
                         <div className="grid gap-4">
-                          {( day.activities ?? []).map((activityId) => {
-                            const activity = getActivityById(activityId);
-                            return activity && (
-                              <div key={activityId} className="bg-white rounded-xl p-4 border border-gray-200">
-                                <h5 className="font-medium">{activity.name}</h5>
-                                <p className="text-gray-600 mt-1">{activity.description}</p>
-                              </div>
-                            );
-                          })}
+                          {activities.map((activity) => (
+                            <div
+                              key={activity.id}
+                              className="bg-white rounded-xl p-4 border border-gray-200"
+                            >
+                              <h5 className="font-medium">{activity.name}</h5>
+                              <p className="text-gray-600 mt-1">{activity.description}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
 
                     {/* Accommodation */}
-                    {day.accommodation && (
+                    {accommodations && accommodations.length > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-medium">Accommodation</h4>
-                        {(() => {
-                          const accommodation = getAccommodationById(day.accommodation);
-                          return accommodation && (
-                            <div className="bg-white rounded-xl p-4 border border-gray-200">
-                              <h5 className="font-medium">{accommodation.name}</h5>
-                              <p className="text-gray-600 mt-1">{accommodation.type}</p>
-                            </div>
-                          );
-                        })()}
+                        {accommodations.map((acc) => (
+                          <div
+                            key={acc.id}
+                            className="bg-white rounded-xl p-4 border border-gray-200"
+                          >
+                            <h5 className="font-medium">{acc.name}</h5>
+                          </div>
+                        ))}
                       </div>
                     )}
 
                     {/* Transport */}
-                    {day.transport && day.transport.length > 0 && (
+                    {transport && transport.length > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-medium">Transport</h4>
                         <div className="grid gap-4">
-                          {day.transport.map((transportId) => {
-                            const transport = getTransportById(transportId);
-                            return transport && (
-                              <div key={transportId} className="bg-white rounded-xl p-4 border border-gray-200">
-                                <h5 className="font-medium">{transport.name}</h5>
-                                <p className="text-gray-600 mt-1">{transport.description}</p>
-                              </div>
-                            );
-                          })}
+                          {transport.map((t) => (
+                            <div
+                              key={t.id}
+                              className="bg-white rounded-xl p-4 border border-gray-200"
+                            >
+                              <h5 className="font-medium">{t.name}</h5>
+                              <p className="text-gray-600 mt-1">{t.description}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </div>
+
           </motion.div>
         </motion.div>
       )}

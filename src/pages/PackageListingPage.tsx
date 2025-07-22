@@ -12,6 +12,7 @@ import TrendingDestinations from '../components/package/listing/TrendingDestinat
 import PackageFilters from '../components/package/listing/PackageFilters';
 import PackageSort from '../components/package/listing/PackageSort';
 import PackageCard from '../components/package/PackageCard';
+import { getPackageRating } from '@/data/reviews';
 
 type SortOption = 'price-low' | 'price-high' | 'rating' | 'duration-short' | 'duration-long';
 
@@ -75,7 +76,8 @@ const PackageListingPage: React.FC = () => {
     results = results.filter(pkg => {
       const matchesPrice = pkg.price >= filters.priceRange[0] && pkg.price <= filters.priceRange[1];
       const matchesDuration = pkg.duration_days >= filters.duration[0] && pkg.duration_days <= filters.duration[1];
-      const matchesRating = !filters.rating || pkg.rating >= filters.rating;
+      const rating = getPackageRating(pkg.id);
+      const matchesRating = !filters.rating || rating.rating >= filters.rating;
       
       return matchesPrice && matchesDuration && matchesRating;
     });
@@ -111,7 +113,11 @@ const PackageListingPage: React.FC = () => {
       case 'price-high':
         return sorted.sort((a, b) => b.price - a.price);
       case 'rating':
-        return sorted.sort((a, b) => b.rating - a.rating);
+        return sorted.sort((a, b) => {
+          const ratingA = getPackageRating(a.id)?.rating ?? 0;
+          const ratingB = getPackageRating(b.id)?.rating ?? 0;
+          return ratingB - ratingA;
+        });        
       case 'duration-short':
         return sorted.sort((a, b) => a.duration_days - b.duration_days);
       case 'duration-long':

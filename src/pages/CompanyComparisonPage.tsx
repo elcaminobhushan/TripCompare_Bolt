@@ -24,9 +24,8 @@ import { useCompareStore } from '../store/useStore';
 import { getPackageById } from '../data/packages';
 import { tourOperators } from '../data/tour-operators';
 import { getPackageItinerary } from '../data/itineraries';
-import { getAccommodationById } from '../data/accommodations';
-import { getActivityById } from '../data/activities';
-import { getMealById } from '../data/meals';
+import { getAccommodationByPackageId } from '../data/accommodations';
+import { getActivitiesByPackageId } from '../data/activities';
 import { getPackageReviews } from '../data/reviews';
 import { formatPrice } from '../utils/formatters';
 import { useEffect } from 'react';
@@ -122,14 +121,14 @@ const CompanyComparisonPage: React.FC = () => {
     const allItineraries = packages.map(pkg => pkg ? getPackageItinerary(pkg.id) : []).flat();
     
     // Get all accommodations
-    const accommodations = packages.map(pkg => pkg ? getAccommodationById(pkg.accommodationId) : null).filter(Boolean);
+    const accommodations = packages.map(pkg => pkg ? getAccommodationByPackageId(pkg.id) : []).flat();
     const avgHotelRating = accommodations.length > 0 
       ? accommodations.reduce((sum, acc) => sum + (acc?.rating || 0), 0) / accommodations.length 
       : 0;
     
     // Get all unique activities
-    const allActivities = allItineraries.reduce((acc, day) => {
-      const dayActivities = day.activities ? day.activities.map(id => getActivityById(id)).filter(Boolean) : [];
+    const allActivities = allItineraries.reduce((acc) => {
+      const dayActivities = packages.map(pkg => pkg ? getActivitiesByPackageId(pkg.id) : []).flat();
       return [...acc, ...dayActivities];
     }, [] as any[]);
     const uniqueActivities = allActivities.filter((activity, index, self) => 
@@ -137,13 +136,8 @@ const CompanyComparisonPage: React.FC = () => {
     );
     
     // Get all unique meals
-    const allMeals = allItineraries.reduce((acc, day) => {
-      const dayMeals = day.meals ? day.meals.map(id => getMealById(id)).filter(Boolean) : [];
-      return [...acc, ...dayMeals];
-    }, [] as any[]);
-    const uniqueMeals = allMeals.filter((meal, index, self) => 
-      index === self.findIndex(m => m.id === meal.id)
-    );
+    const allMeals = packages.flatMap(pkg => pkg?.meal ?? []); // array of strings
+    const uniqueMeals = [...new Set(allMeals)];
     
     // Get reviews for all packages
     const allReviews = packages.map(pkg => pkg ? getPackageReviews(pkg.id) : []).flat();

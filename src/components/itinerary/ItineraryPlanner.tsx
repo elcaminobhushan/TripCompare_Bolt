@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Package } from '../../types';
 import { 
-  Activity, Phone, Eye, Calendar, Clock, MapPinned, BedDouble, Car, Menu
+  Activity, Phone, Eye, Calendar, MapPinned, BedDouble, Car, Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FloatingContactForm from '../contact/FloatingContactForm';
@@ -222,7 +222,6 @@ const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({ packages }) => {
                       return accommodation ? (
                         <div>
                           <h4 className="font-medium text-gray-900 text-sm md:text-base">{accommodation.name}</h4>
-                          <p className="text-gray-600 mt-1 text-xs md:text-sm">{accommodation.type}</p>
                         </div>
                       ) : null;
                     })()}
@@ -251,10 +250,6 @@ const ItineraryPlanner: React.FC<ItineraryPlannerProps> = ({ packages }) => {
                           <div className="min-w-0 flex-1">
                             <h4 className="font-medium text-gray-900 text-sm md:text-base">{activity.name}</h4>
                             <p className="text-xs md:text-sm text-gray-600 mt-1">{activity.description}</p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <Clock className="h-3 w-3 md:h-4 md:w-4 text-gray-400" />
-                              <span className="text-xs md:text-sm text-gray-600">{activity.duration} hours</span>
-                            </div>
                           </div>
                         </div>
                       </motion.div>

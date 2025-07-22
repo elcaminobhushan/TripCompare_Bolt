@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Package } from '../../../types';
 import { ChevronDown, ChevronUp, Plane,Bus,Ship,Train,Car,Route, CheckCircle } from 'lucide-react';
 import { getPackageItinerary } from '../../../data/itineraries';
-import { getTransportById } from '../../../data/transport';
+import { getTransportByItenaryId } from '../../../data/transport';
 
 interface TransportProps {
   packageData: Package;
@@ -47,14 +47,14 @@ const Transport: React.FC<TransportProps> = ({ packageData }) => {
         : [...prev, day]
     );
   };
-
   return (
     <div className="space-y-6">
       {itinerary.map((day) => {
-        const transportsForDay = day.transport?.map((id: string) => getTransportById(id)).filter(Boolean) || [];
-        
+        const transportsForDay = getTransportByItenaryId(day.id) || [];
+        const isExpanded = expandedDays.includes(day.day);
+  
         return (
-          <div 
+          <div
             key={day.day}
             className="border border-gray-200 rounded-xl overflow-hidden"
           >
@@ -69,70 +69,60 @@ const Transport: React.FC<TransportProps> = ({ packageData }) => {
                 <div className="text-left">
                   <h3 className="font-semibold">{day.title}</h3>
                   <p className="text-sm text-gray-500">
-                    {transportsForDay.length} transport {transportsForDay.length === 1 ? 'option' : 'options'}
+                    {transportsForDay.length} transport{' '}
+                    {transportsForDay.length === 1 ? 'option' : 'options'}
                   </p>
                 </div>
               </div>
-              {expandedDays.includes(day.day) ? (
+              {isExpanded ? (
                 <ChevronUp className="h-5 w-5 text-gray-400" />
               ) : (
                 <ChevronDown className="h-5 w-5 text-gray-400" />
               )}
             </button>
-            
-            {expandedDays.includes(day.day) && (
+  
+            {isExpanded && (
               <div className="p-4 bg-gray-50 border-t border-gray-200">
-                {transportsForDay.map((transport: any, index: number) => (
-                  <div key={transport.id} className={`bg-white rounded-lg p-6 ${index > 0 ? 'mt-4' : ''}`}>
-                    <div className="flex items-center gap-4 mb-6">
-                    <div className="h-12 w-12 bg-primary-50 rounded-full flex items-center justify-center">
-                    {getTransportIcon(transport.type)}
-                      </div>
-                      <div>
-                        <h4 className="font-medium">{transport.name}</h4>
-                        {/* <p className="text-sm text-gray-500">Provided by {transport.provider}</p> */}
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <p className="text-gray-600">{transport.details}</p>
-                      
-                      {transport.features && transport.features.length > 0 && (
-                        <div className="space-y-2">
-                          <h5 className="font-medium text-sm">Features:</h5>
-                          <div className="grid grid-cols-2 gap-2">
-                            {transport.features.map((feature: string, i: number) => (
-                              <div key={i} className="flex items-center gap-2">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                                <span className="text-sm">{feature}</span>
-                              </div>
-                            ))}
-                          </div>
+                {transportsForDay.length > 0 ? (
+                  transportsForDay.map((transport: any, index: number) => (
+                    <div
+                      key={transport.id}
+                      className={`bg-white rounded-lg p-6 ${index > 0 ? 'mt-4' : ''}`}
+                    >
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="h-12 w-12 bg-primary-50 rounded-full flex items-center justify-center">
+                          {getTransportIcon(transport.type)}
                         </div>
-                      )}
-                      
-                      {/* <div className="flex items-center gap-2">
-                        {transport.included ? (
-                          <>
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="text-sm font-medium text-green-600">
-                              Included in package
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <X className="h-5 w-5 text-red-600" />
-                            <span className="text-sm font-medium text-red-600">
-                              Not included in package
-                            </span>
-                          </>
+                        <div>
+                          <h4 className="font-medium">{transport.name}</h4>
+                          {transport.provider && (
+                            <p className="text-sm text-gray-500">Provided by {transport.provider}</p>
+                          )}
+                        </div>
+                      </div>
+  
+                      <div className="space-y-4">
+                        {transport.details && (
+                          <p className="text-gray-600">{transport.details}</p>
                         )}
-                      </div> */}
+  
+                        {transport.features?.length > 0 && (
+                          <div className="space-y-2">
+                            <h5 className="font-medium text-sm">Features:</h5>
+                            <div className="grid grid-cols-2 gap-2">
+                              {transport.features.map((feature: string, i: number) => (
+                                <div key={i} className="flex items-center gap-2">
+                                  <CheckCircle className="h-4 w-4 text-green-600" />
+                                  <span className="text-sm">{feature}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-                
-                {transportsForDay.length === 0 && (
+                  ))
+                ) : (
                   <div className="bg-white rounded-lg p-6 text-center text-gray-500">
                     No transportation scheduled for this day
                   </div>
@@ -143,7 +133,7 @@ const Transport: React.FC<TransportProps> = ({ packageData }) => {
         );
       })}
     </div>
-  );
+  );  
 };
 
 export default Transport;

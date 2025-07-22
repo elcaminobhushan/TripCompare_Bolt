@@ -39,25 +39,22 @@ export function usePackages() {
           id: pkg.id,
           title: pkg.title,
           destinationId: pkg.destination_id,
-          image: pkg.image,
+          mainImage: pkg.mainImage,
+          images: pkg.images,
           price: pkg.price,
           currency: pkg.currency,
           duration_days: pkg.duration_days,
           duration_nights: pkg.duration_nights,
-          rating: pkg.rating,
-          reviews: pkg.reviews,
           description: pkg.description,
-          itineraryId: pkg.id, // Using package ID as itinerary ID
-          accommodationId: pkg.accommodation_id,
+          tags : pkg.tags,
           tourOperatorId: pkg.tour_operator_id,
-          transportIds: pkg.transports.map((t: any) => t.transport.id),
           inclusions: pkg.inclusions.map((i: any) => i.description),
           exclusions: pkg.exclusions.map((e: any) => e.description),
           featured: pkg.featured,
           discount: pkg.discount,
-          departureLocations: ["Delhi"], // Default value
-          tags: pkg.tags.map((t: any) => t.tag),
-          itinerary: `${pkg.id}.pdf` // Default value
+          departureLocations: pkg.departureLocations,
+          itineraryPdf: pkg.itineraryPdf,
+          meal : pkg.meal
         }));
 
         setData(transformedPackages);
@@ -120,25 +117,22 @@ export function usePackage(id: string) {
           id: pkg.id,
           title: pkg.title,
           destinationId: pkg.destination_id,
-          image: pkg.image,
+          mainImage: pkg.mainImage,
+          images: pkg.images,
           price: pkg.price,
           currency: pkg.currency,
           duration_days: pkg.duration_days,
           duration_nights: pkg.duration_nights,
-          rating: pkg.rating,
-          reviews: pkg.reviews,
           description: pkg.description,
-          itineraryId: pkg.id, // Using package ID as itinerary ID
-          accommodationId: pkg.accommodation_id,
           tourOperatorId: pkg.tour_operator_id,
-          transportIds: pkg.transports.map((t: any) => t.transport.id),
           inclusions: pkg.inclusions.map((i: any) => i.description),
           exclusions: pkg.exclusions.map((e: any) => e.description),
           featured: pkg.featured,
           discount: pkg.discount,
-          departureLocations: ["Delhi"], // Default value
-          tags: pkg.tags.map((t: any) => t.tag),
-          itinerary: `${pkg.id}.pdf` // Default value
+          departureLocations: pkg.departureLocations,
+          itineraryPdf: pkg.itineraryPdf,
+          meal : pkg.meal,
+          tags : pkg.tags
         };
 
         setData(transformedPackage);
@@ -201,25 +195,22 @@ export function useRelatedPackages(id: string, limit: number = 3) {
           id: pkg.id,
           title: pkg.title,
           destinationId: pkg.destination_id,
-          image: pkg.image,
+          mainImage: pkg.mainImage,
+          images: pkg.images,
           price: pkg.price,
           currency: pkg.currency,
           duration_days: pkg.duration_days,
           duration_nights: pkg.duration_nights,
-          rating: pkg.rating,
-          reviews: pkg.reviews,
           description: pkg.description,
-          itineraryId: pkg.id, // Using package ID as itinerary ID
-          accommodationId: pkg.accommodation_id,
           tourOperatorId: pkg.tour_operator_id,
-          transportIds: pkg.transports.map((t: any) => t.transport.id),
           inclusions: pkg.inclusions.map((i: any) => i.description),
           exclusions: pkg.exclusions.map((e: any) => e.description),
           featured: pkg.featured,
           discount: pkg.discount,
-          departureLocations: ["Delhi"], // Default value
-          tags: pkg.tags.map((t: any) => t.tag),
-          itinerary: `${pkg.id}.pdf` // Default value
+          departureLocations: pkg.departureLocations,
+          itineraryPdf: pkg.itineraryPdf,
+          meal : pkg.meal,
+          tags : pkg.tags
         }));
 
         setData(transformedPackages);
@@ -292,25 +283,22 @@ export function useFilteredPackages(filters: any) {
           id: pkg.id,
           title: pkg.title,
           destinationId: pkg.destination_id,
-          image: pkg.image,
+          mainImage: pkg.mainImage,
+          images: pkg.images,
           price: pkg.price,
           currency: pkg.currency,
           duration_days: pkg.duration_days,
           duration_nights: pkg.duration_nights,
-          rating: pkg.rating,
-          reviews: pkg.reviews,
           description: pkg.description,
-          itineraryId: pkg.id, // Using package ID as itinerary ID
-          accommodationId: pkg.accommodation_id,
           tourOperatorId: pkg.tour_operator_id,
-          transportIds: pkg.transports.map((t: any) => t.transport.id),
           inclusions: pkg.inclusions.map((i: any) => i.description),
           exclusions: pkg.exclusions.map((e: any) => e.description),
           featured: pkg.featured,
           discount: pkg.discount,
-          departureLocations: ["Delhi"], // Default value
-          tags: pkg.tags.map((t: any) => t.tag),
-          itinerary: `${pkg.id}.pdf` // Default value
+          departureLocations: pkg.departureLocations,
+          itineraryPdf: pkg.itineraryPdf,
+          meal : pkg.meal,
+          tags : pkg.tags
         }));
 
         setData(transformedPackages);
