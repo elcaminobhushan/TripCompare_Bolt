@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TravelPreferencesModal from '../ai/TravelPreferencesModal';
-import { Sparkles, Search, Globe } from 'lucide-react';
+import { Search, Globe } from 'lucide-react';
 
 const Hero: React.FC = () => {
   const navigate = useNavigate();
-  const [showPreferences, setShowPreferences] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = () => {
@@ -36,22 +34,6 @@ const Hero: React.FC = () => {
             Compare thousands of holiday packages to find the best deals for your dream getaway
           </p>
           
-          {/* AI Recommendation Button */}
-          <button
-            onClick={() => setShowPreferences(true)}
-            className="btn bg-white hover:bg-gray-50 text-primary-600 px-8 py-4 rounded-xl font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3 mx-auto mb-6 group"
-          >
-            <Sparkles className="h-5 w-5 text-primary-600 group-hover:animate-pulse" />
-            Get AI Travel Recommendations
-          </button>
-
-          {/* OR Divider */}
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="h-px w-12 bg-white/30"></div>
-            <span className="text-white/70 font-medium">OR</span>
-            <div className="h-px w-12 bg-white/30"></div>
-          </div>
-
           {/* Search Option */}
           <div className="max-w-2xl mx-auto bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
             <div className="flex flex-col md:flex-row gap-3">
@@ -76,12 +58,6 @@ const Hero: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Travel Preferences Modal */}
-      <TravelPreferencesModal 
-        isOpen={showPreferences}
-        onClose={() => setShowPreferences(false)}
-      />
     </div>
   );
 };

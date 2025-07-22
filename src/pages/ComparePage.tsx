@@ -39,7 +39,7 @@ ChartJS.register(
   ArcElement
 );
 
-type TabType = 'overview' | 'accommodations' | 'activities' | 'transport' | 'meals' | 'analysis';
+type TabType = 'overview' | 'accommodations' | 'activities' | 'transport' | 'meals';
 
 const ComparePage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,59 +58,6 @@ const ComparePage: React.FC = () => {
     setPackages(selectedPackages);
     setIsLoading(false);
   }, [compareList]);
-
-  const getRadarChartData = () => {
-    const labels = ['Value', 'Accommodation', 'Activities', 'Transport', 'Meals'];
-  
-    const maxPrice = Math.max(...packages.map(p => p.price));
-    const maxActivities = Math.max(...packages.map(p => getActivitiesByPackageId(p.id)?.length ?? 0));
-    const maxTransports = Math.max(...packages.map(p => getTransportByPackageId(p.id)?.length ?? 0));
-    const maxMeals = Math.max(...packages.map(p => p.meal?.length ?? 0));
-  
-    const colors = [
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(255, 99, 132, 0.2)',
-      'rgba(75, 192, 192, 0.2)',
-      'rgba(255, 206, 86, 0.2)',
-      'rgba(153, 102, 255, 0.2)',
-    ];
-  
-    const borderColors = [
-      'rgb(54, 162, 235)',
-      'rgb(255, 99, 132)',
-      'rgb(75, 192, 192)',
-      'rgb(255, 206, 86)',
-      'rgb(153, 102, 255)',
-    ];
-  
-    const datasets = packages.map((pkg, index) => {
-      const accommodation = getAccommodationByPackageId(pkg.id) ?? [];
-      const transport = getTransportByPackageId(pkg.id) ?? [];
-      const activities = getActivitiesByPackageId(pkg.id) ?? [];
-      const meals = pkg.meal ?? [];
-  
-      // Normalized scores
-      const valueScore = 100 - ((pkg.price / maxPrice) * 100); // lower price → higher score
-      const accommodationScore =
-        accommodation.length > 0
-          ? (accommodation.reduce((sum, acc) => sum + acc.rating, 0) / (accommodation.length * 5)) * 100
-          : 0;
-      const activitiesScore = maxActivities > 0 ? (activities.length / maxActivities) * 100 : 0;
-      const transportScore = maxTransports > 0 ? (transport.length / maxTransports) * 100 : 0;
-      const mealsScore = maxMeals > 0 ? (meals.length / maxMeals) * 100 : 0;
-  
-      return {
-        label: pkg.title,
-        data: [valueScore, accommodationScore, activitiesScore, transportScore, mealsScore],
-        backgroundColor: colors[index % colors.length],
-        borderColor: borderColors[index % borderColors.length],
-        borderWidth: 2,
-      };
-    });
-  
-    return { labels, datasets };
-  };
-  
 
   if (isLoading) {
     return (
@@ -265,41 +212,6 @@ const ComparePage: React.FC = () => {
             ) : (
               <p className="text-gray-500 text-sm">No meals included</p>
             )}
-          </div>
-        )}
-  
-        {activeTab === 'analysis' && (
-          <div className="bg-white rounded-lg p-4">
-            <h4 className="font-medium mb-6">Package Analysis Overview</h4>
-            <div className="aspect-square">
-              <Radar
-                data={getRadarChartData()} // call once outside map if used for all packages
-                options={{
-                  scales: {
-                    r: {
-                      angleLines: { display: true },
-                      suggestedMin: 0,
-                      suggestedMax: 100,
-                      ticks: { display: false },
-                    },
-                  },
-                  plugins: {
-                    legend: { position: 'bottom' },
-                  },
-                }}
-              />
-            </div>
-            <div className="mt-6">
-              <h5 className="font-medium mb-3">Insights</h5>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>
-                  <span className="font-medium text-gray-900">{pkg.title}</span>:
-                  {transport.length > 0 ? ' Includes transportation,' : ' No transportation,'}
-                  {' '}
-                  {activities.length} activities, and {meals.length} meals included.
-                </li>
-              </ul>
-            </div>
           </div>
         )}
       </div>
