@@ -158,10 +158,11 @@ const CompareTable: React.FC<CompareTableProps> = ({ packages }) => {
 
           <tr>
             <td className="px-6 py-4 font-medium">Transportation</td>
-            {packages.map((pkg) => {
+            {packages.map((pkg) => (
               <PackageTransportCell key={pkg.id} packageId={pkg.id} />
-            })}
+            ))}
           </tr>
+
           
           
           {/* Actions */}

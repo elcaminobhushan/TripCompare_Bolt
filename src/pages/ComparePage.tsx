@@ -6,7 +6,7 @@ import { useDestinations } from '../hooks/useDestinations';
 import { useCompareStore } from '../store/useStore';
 import { usePackageRating } from '../hooks/useReviews';
 
-import { Plane, Bus, Train, Ship, Car ,Scale, X,Activity,Star} from "lucide-react"; 
+import {Scale, X,Star} from "lucide-react"; 
   
 import {
   Chart as ChartJS,
@@ -21,7 +21,6 @@ import {
   BarElement,
   ArcElement
 } from 'chart.js';
-import { Radar } from 'react-chartjs-2';
 
 ChartJS.register(
   RadialLinearScale,
@@ -36,7 +35,6 @@ ChartJS.register(
   ArcElement
 );
 
-type TabType = 'overview' | 'accommodations' | 'activities' | 'transport' | 'meals';
 
 const ComparePage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,7 +44,6 @@ const ComparePage: React.FC = () => {
   const { data: destinations } = useDestinations();
   
   const [packages, setPackages] = useState<Package[]>([]);
-  const [activeTab] = useState<TabType>('overview');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -160,16 +157,6 @@ const PackageCompareCard: React.FC<{
           </div>
         </div>
       </div>
-  const getTransportIcon = (transport: string) => {
-    switch (transport) {
-      case 'flight': return <Plane className="h-5 w-5 text-blue-500" />;
-      case 'bus': return <Bus className="h-5 w-5 text-green-500" />;
-      case 'train': return <Train className="h-5 w-5 text-purple-500" />;
-      case 'ship': return <Ship className="h-5 w-5 text-cyan-500" />;
-      default: return <Car className="h-5 w-5 text-gray-500" />;
-    }
-  };
-};
 
       {/* Meals */}
       <div className="bg-white rounded-lg p-4">

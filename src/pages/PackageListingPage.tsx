@@ -4,7 +4,6 @@ import { useDestinations } from '@/hooks/useDestinations';
 import { usePackages } from '@/hooks/usePackages';
 import { Package } from '../types';
 import { useCompare } from '../hooks/useCompare';
-import { usePackageRating } from '@/hooks/useReviews';
 
 // Components
 import SearchBar from '../components/package/listing/SearchBar';
@@ -114,7 +113,7 @@ const PackageListingPage: React.FC = () => {
       case 'price-high':
         return sorted.sort((a, b) => b.price - a.price);
       case 'rating':
-        return sorted.sort((a, b) => {
+        return sorted.sort(() => {
           // Simplified rating sort - would need more complex implementation with hooks
           return 0;
         });        

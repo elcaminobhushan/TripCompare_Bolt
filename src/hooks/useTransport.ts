@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConnected } from '../lib/supabase';
 import { transport as localTransport } from '../data/transport';
 
+import type { Transport as TransportType } from '../types';
+
 interface Transport {
   id: string;
   itenaryId: string;
@@ -111,6 +113,5 @@ export function useTransportByItineraryId(itenaryId: string) {
 
     fetchTransport();
   }, [itenaryId]);
-
-  return { data, isLoading, error };
+  return { data: data as TransportType[], isLoading, error };
 }

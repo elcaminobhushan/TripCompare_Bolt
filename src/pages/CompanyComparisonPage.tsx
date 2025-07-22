@@ -23,8 +23,6 @@ import { Bar, Radar, Doughnut } from 'react-chartjs-2';
 import { useCompareStore } from '../store/useStore';
 import { usePackages } from '../hooks/usePackages';
 import { useTourOperators } from '../hooks/useTourOperators';
-import { usePackageItinerary } from '../hooks/useItineraries';
-import { usePackageReviews } from '../hooks/useReviews';
 import { formatPrice } from '../utils/formatters';
 import { useEffect } from 'react';
 

@@ -17,7 +17,7 @@ export interface Package {
   tourOperatorId: string;
   itineraryPdf : string;
   meal: string[];
-  tags : string[];
+  tags: string[];
 }
 
 
@@ -62,13 +62,10 @@ export interface Accommodation {
 
 export interface Transport {
   id: string;
+  itenaryId: string;
   type: string;
   name: string;
-  provider: string;
-  details: string;
-  included: boolean;
-  features: string[];
-  image: string;
+  description: string;
 }
 
 export interface Activity {
@@ -174,9 +171,5 @@ export interface ItineraryDay {
   day: number;
   title: string;
   description: string;
-  activityIds: string[];
-  mealIds: string[];
-  accommodationId: string;
-  transportIds?: string[];
   notes?: string;
 }

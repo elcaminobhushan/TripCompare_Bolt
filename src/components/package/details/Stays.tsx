@@ -20,13 +20,6 @@ const Stays: React.FC<StaysProps> = ({ packageData }) => {
     );
   };
 
-  const renderStarRating = (rating: number) => {
-    if (!rating || rating <= 0) return null;
-    
-    return [...Array(Math.floor(rating))].map((_, i) => (
-      <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
-    ));
-  };
 
   if (!itinerary) {
     return <div className="text-gray-500">No accommodation information available.</div>;

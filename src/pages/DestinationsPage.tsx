@@ -1,14 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sun, Cloud, Plane, DollarSign } from 'lucide-react';
-import { packages } from '../data/packages';
 import { useDestinations } from '@/hooks/useDestinations';
+import { usePackages } from '../hooks/usePackages';
 
 const DestinationsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const getDestinationStats = (destinationId: string) => {
-    const destinationPackages = packages.filter(pkg => pkg.destinationId === destinationId);
+    const { data: destinationPackages } = usePackages();
+    if(destinationPackages.filter(a => a.id===destinationId)){
+      console.log("as");
+    }
 
     const prices = destinationPackages.map(pkg => pkg.price);
     const minPrice = Math.min(...prices);
