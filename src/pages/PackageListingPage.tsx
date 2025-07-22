@@ -19,7 +19,6 @@ interface FilterState {
   priceRange: [number, number];
   duration: [number, number];
   rating: number | null;
-  amenities: string[];
   travelTheme: string[];
   inclusions: string[];
 }
@@ -44,7 +43,6 @@ const PackageListingPage: React.FC = () => {
     priceRange: [0, 500000],
     duration: [1, 14],
     rating: null,
-    amenities: [],
     travelTheme: [],
     inclusions: []
   });
@@ -76,10 +74,20 @@ const PackageListingPage: React.FC = () => {
     results = results.filter(pkg => {
       const matchesPrice = pkg.price >= filters.priceRange[0] && pkg.price <= filters.priceRange[1];
       const matchesDuration = pkg.duration_days >= filters.duration[0] && pkg.duration_days <= filters.duration[1];
-      // We'll need to handle rating filtering differently since it requires individual hooks
-      const matchesRating = true; // Simplified for now
       
-      return matchesPrice && matchesDuration && matchesRating;
+      // Travel theme filtering based on package tags
+      const matchesTravelTheme = filters.travelTheme.length === 0 || 
+        (pkg.tags && filters.travelTheme.some(theme => pkg.tags.includes(theme)));
+      
+      // Inclusions filtering based on package inclusions
+      const matchesInclusions = filters.inclusions.length === 0 ||
+        (pkg.inclusions && filters.inclusions.some(inclusion => 
+          pkg.inclusions.some(pkgInclusion => 
+            pkgInclusion.toLowerCase().includes(inclusion.toLowerCase())
+          )
+        ));
+      
+      return matchesPrice && matchesDuration && matchesTravelTheme && matchesInclusions;
     });
 
     setFilteredPackages(results);
@@ -172,7 +180,6 @@ const PackageListingPage: React.FC = () => {
                   priceRange: [0, 500000],
                   duration: [1, 14],
                   rating: null,
-                  amenities: [],
                   travelTheme: [],
                   inclusions: []
                 });
@@ -223,7 +230,6 @@ const PackageListingPage: React.FC = () => {
                       duration: [1, 14],
                       rating: null,
                       amenities: [],
-                      travelTheme: [],
                       inclusions: []
                     });
                     setSearchQuery('');

@@ -5,7 +5,6 @@ interface FilterState {
   priceRange: [number, number];
   duration: [number, number];
   rating: number | null;
-  amenities: string[];
   travelTheme: string[];
   inclusions: string[];
 }
@@ -25,9 +24,48 @@ const PackageFilters: React.FC<PackageFiltersProps> = ({
   expandedFilters,
   onToggleFilter
 }) => {
-  const travelThemes = ['Adventure', 'Beach', 'Cultural', 'Family', 'Honeymoon', 'Luxury'];
-  const amenities = ['Pool', 'Spa', 'WiFi', 'Gym', 'Restaurant', 'Bar'];
-  const inclusions = ['Flights', 'Meals', 'Transfers', 'Activities', 'Guide'];
+  const travelThemes = [
+    'Full Moon Party', 
+    'Flights Included', 
+    'Group Tour', 
+    'Thailand Highlights', 
+    'Beaches', 
+    'Cabaret', 
+    'Culture',
+    'Solo Travel',
+    'Beach Parties',
+    'Island Hopping',
+    'Nightlife',
+    'Indian Travelers',
+    'Digital Nomads',
+    'International Trips',
+    'Adventure',
+    'New Year Celebrations',
+    'City + Beach',
+    'Family Friendly'
+  ];
+  
+  const inclusions = [
+    'Return international flight',
+    'Airport pick-up and drop',
+    'accommodation',
+    'Daily breakfast',
+    'Indian lunches',
+    'Phi Phi Island day trip',
+    'Island tour',
+    'Transfer',
+    'Trip Captain',
+    'Speedboat',
+    'Simon Cabaret Show',
+    'City Tour',
+    'Safari World',
+    'Marine Park',
+    'Coral Island Tour',
+    'Temple Tour',
+    'Travel Insurance',
+    'Entry fees',
+    'Local guide'
+  ];
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 sticky top-[144px]">
@@ -138,42 +176,6 @@ const PackageFilters: React.FC<PackageFiltersProps> = ({
           )}
         </div>
 
-        {/* Amenities */}
-        <div className="border-b border-gray-200 pb-6">
-          <button
-            className="flex items-center justify-between w-full mb-4"
-            onClick={() => onToggleFilter('amenities')}
-          >
-            <span className="font-medium">Amenities</span>
-            {expandedFilters.includes('amenities') ? (
-              <ChevronUp className="h-5 w-5 text-gray-400" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-gray-400" />
-            )}
-          </button>
-          
-          {expandedFilters.includes('amenities') && (
-            <div className="space-y-2">
-              {amenities.map((amenity) => (
-                <label key={amenity} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-4 w-4 text-primary-600 rounded border-gray-300"
-                    checked={filters.amenities.includes(amenity)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        onFilterChange('amenities', [...filters.amenities, amenity]);
-                      } else {
-                        onFilterChange('amenities', filters.amenities.filter(a => a !== amenity));
-                      }
-                    }}
-                  />
-                  <span className="ml-2 text-gray-700">{amenity}</span>
-                </label>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Inclusions */}
         <div>
