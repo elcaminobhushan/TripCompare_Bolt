@@ -1,5 +1,5 @@
 import React from 'react';
-import { PackageReview } from '../../../data/reviews';
+import type { PackageReview } from '../../../data/reviews';
 import { Star, ThumbsUp, Check, Image as ImageIcon } from 'lucide-react';
 
 interface ReviewsProps {

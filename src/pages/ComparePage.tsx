@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package } from '../types';
-import { getPackageById } from '../data/packages';
-import { getDestinationById } from '../data/destinations';
-import { getAccommodationByPackageId } from '../data/accommodations';
-import { getTransportByPackageId } from '../data/transport';
-import { getActivitiesByPackageId } from '../data/activities';
+import { usePackages } from '../hooks/usePackages';
+import { useDestinations } from '../hooks/useDestinations';
 import { useCompareStore } from '../store/useStore';
+import { usePackageRating } from '../hooks/useReviews';
 
 import { Plane, Bus, Train, Ship, Car ,Scale, X,Activity,Star} from "lucide-react"; 
   
@@ -24,7 +22,6 @@ import {
   ArcElement
 } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
-import { getPackageRating } from '@/data/reviews';
 
 ChartJS.register(
   RadialLinearScale,
@@ -45,6 +42,8 @@ const ComparePage: React.FC = () => {
   const navigate = useNavigate();
   const compareList = useCompareStore((state) => state.compareList);
   const removeFromCompare = useCompareStore((state) => state.removeFromCompare);
+  const { data: allPackages } = usePackages();
+  const { data: destinations } = useDestinations();
   
   const [packages, setPackages] = useState<Package[]>([]);
   const [activeTab] = useState<TabType>('overview');
@@ -53,11 +52,11 @@ const ComparePage: React.FC = () => {
   useEffect(() => {
     setIsLoading(true);
     const selectedPackages = compareList
-      .map(id => getPackageById(id))
+      .map(id => allPackages?.find(pkg => pkg.id === id))
       .filter((pkg): pkg is Package => pkg !== undefined);
     setPackages(selectedPackages);
     setIsLoading(false);
-  }, [compareList]);
+  }, [compareList, allPackages]);
 
   if (isLoading) {
     return (
@@ -92,132 +91,75 @@ const ComparePage: React.FC = () => {
     );
   }
 
-  {packages.map(pkg => {
-    const destination = getDestinationById(pkg.destinationId);
-    const accommodations = getAccommodationByPackageId(pkg.id) ?? [];
-    const transport = getTransportByPackageId(pkg.id) ?? [];
-    const activities = getActivitiesByPackageId(pkg.id) ?? [];
-    const meals = pkg.meal ?? [];
-    const rating = getPackageRating(pkg.id);
-    return (
-      <div key={pkg.id} className="relative">
-        <button
-          onClick={() => removeFromCompare(pkg.id)}
-          className="absolute -top-2 -right-2 p-2 bg-white rounded-full shadow-md text-gray-400 hover:text-gray-600"
-        >
-          <X className="h-4 w-4" />
-        </button>
-  
-        {/* Package Header */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-          <img
-            src={pkg.mainImage}
-            alt={pkg.title}
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <h3 className="font-semibold text-lg mb-2">{pkg.title}</h3>
-            <p className="text-gray-600 mb-3">
-              {destination?.name}, {destination?.country}
-            </p>
-            <div className="flex items-baseline gap-2 mb-3">
-              <span className="text-2xl font-bold">₹{pkg.price}</span>
-              {pkg.discount && (
-                <span className="text-green-600 text-sm font-medium">
-                  Save {pkg.discount}%
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2 text-amber-500">
-              <Star className="h-5 w-5 fill-current" />
-              <span className="font-medium">{rating.rating}</span>
-              <span className="text-gray-500">({rating.count}+ reviews)</span>
-            </div>
+  return (
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="container mx-auto px-4">
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-2">
+          <Scale className="h-7 w-7 text-primary-600" />
+          Package Comparison
+        </h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {packages.map(pkg => (
+            <PackageCompareCard
+              key={pkg.id}
+              pkg={pkg}
+              destinations={destinations || []}
+              onRemove={() => removeFromCompare(pkg.id)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Separate component for each package card to handle hooks properly
+const PackageCompareCard: React.FC<{
+  pkg: Package;
+  destinations: any[];
+  onRemove: () => void;
+}> = ({ pkg, destinations, onRemove }) => {
+  const { data: rating } = usePackageRating(pkg.id);
+  const destination = destinations.find(d => d.id === pkg.destinationId);
+  const meals = pkg.meal ?? [];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={onRemove}
+        className="absolute -top-2 -right-2 p-2 bg-white rounded-full shadow-md text-gray-400 hover:text-gray-600 z-10"
+      >
+        <X className="h-4 w-4" />
+      </button>
+
+      {/* Package Header */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+        <img
+          src={pkg.mainImage}
+          alt={pkg.title}
+          className="w-full h-48 object-cover"
+        />
+        <div className="p-4">
+          <h3 className="font-semibold text-lg mb-2">{pkg.title}</h3>
+          <p className="text-gray-600 mb-3">
+            {destination?.name}, {destination?.country}
+          </p>
+          <div className="flex items-baseline gap-2 mb-3">
+            <span className="text-2xl font-bold">₹{pkg.price}</span>
+            {pkg.discount && (
+              <span className="text-green-600 text-sm font-medium">
+                Save {pkg.discount}%
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 text-amber-500">
+            <Star className="h-5 w-5 fill-current" />
+            <span className="font-medium">{rating.rating}</span>
+            <span className="text-gray-500">({rating.count}+ reviews)</span>
           </div>
         </div>
-  
-        {/* Tab Content */}
-        {activeTab === 'accommodations' && accommodations.length > 0 && (
-          <div className="bg-white rounded-lg p-4">
-            <h4 className="font-medium mb-4">Accommodation Details</h4>
-            {accommodations.map((acc) => (
-              <div key={acc.id} className="mb-4">
-                <img
-                  src={acc.image}
-                  alt={acc.name}
-                  className="w-full h-40 object-cover rounded-lg mb-3"
-                />
-                <div>
-                  <h5 className="font-medium">{acc.name}</h5>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-  
-        {activeTab === 'activities' && (
-          <div className="bg-white rounded-lg p-4">
-            <h4 className="font-medium mb-4">Activities Included</h4>
-            <div className="space-y-3">
-            {activities && activities.length > 0 ? (
-              <ul className="space-y-2">
-                {activities.map((act, i) => (
-                  <li key={act.id ?? i} className="flex items-center gap-2 text-sm">
-                    <Activity className="h-4 w-4 text-primary-600" />
-                    {act.name}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 text-sm">No activities scheduled</p>
-            )}
-
-            </div>
-          </div>
-        )}
-  
-        {activeTab === 'transport' && (
-          <div className="bg-white rounded-lg p-4">
-            <h4 className="font-medium mb-4">Transportation</h4>
-            <div className="space-y-4">
-              {transport.map((t) => (
-                <div key={t.id} className="flex items-start gap-3">
-                  <div className="bg-primary-50 p-2 rounded-full">
-                    {getTransportIcon(t.type)}
-                  </div>
-                  <div>
-                    <h5 className="font-medium">{t.type}</h5>
-                    <p className="text-sm text-gray-600">{t.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-  
-        {activeTab === 'meals' && (
-          <div className="bg-white rounded-lg p-4">
-            <h4 className="font-medium mb-4">Meals Included</h4>
-            {meals.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {meals.map((meal, i) => (
-                  <span
-                    key={i}
-                    className="bg-primary-50 text-primary-600 px-3 py-1 rounded-full text-sm"
-                  >
-                    {meal}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">No meals included</p>
-            )}
-          </div>
-        )}
       </div>
-    );
-  })}
-
   const getTransportIcon = (transport: string) => {
     switch (transport) {
       case 'flight': return <Plane className="h-5 w-5 text-blue-500" />;
@@ -229,4 +171,25 @@ const ComparePage: React.FC = () => {
   };
 };
 
+      {/* Meals */}
+      <div className="bg-white rounded-lg p-4">
+        <h4 className="font-medium mb-4">Meals Included</h4>
+        {meals.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {meals.map((meal, i) => (
+              <span
+                key={i}
+                className="bg-primary-50 text-primary-600 px-3 py-1 rounded-full text-sm"
+              >
+                {meal}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">No meals included</p>
+        )}
+      </div>
+    </div>
+  );
+};
 export default ComparePage;

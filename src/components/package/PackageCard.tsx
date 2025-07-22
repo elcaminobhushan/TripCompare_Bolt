@@ -4,12 +4,12 @@ import { Heart, Star, Clock, Plus, Check, Plane, Hotel, Coffee, MapPin, Download
 import { Destination, Package } from '../../types';
 import { useFavoritesStore, useCompareStore } from '../../store/useStore';
 import { formatPrice, calculateFinalPrice } from '../../utils/formatters';
-//import { destinations } from '../../data/destinations';
 import { useDestinations } from '../../hooks/useDestinations'; 
-import { tourOperators } from '../../data/tour-operators';
-import { getPackageRating } from '../../data/reviews';
-import { getAccommodationByPackageId } from '../../data/accommodations';
-import {getTransportByPackageId} from '../../data/transport';
+import { useTourOperator } from '../../hooks/useTourOperators';
+import { usePackageRating } from '../../hooks/useReviews';
+import { useAccommodationsByItineraryId } from '../../hooks/useAccommodations';
+import { useTransportByItineraryId } from '../../hooks/useTransport';
+import { usePackageItinerary } from '../../hooks/useItineraries';
 
 interface PackageCardProps {
   packageData: Package;
@@ -27,13 +27,18 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
   const { data: destinations, isLoading, error } = useDestinations();
   if (isLoading) return <p>Loading destinations...</p>;
   if (error) return <p>Error loading destinations</p>;
+  
+  const { data: tourOperator } = useTourOperator(packageData.tourOperatorId);
+  const { data: rating } = usePackageRating(packageData.id);
+  const { data: itinerary } = usePackageItinerary(packageData.id);
+  
+  // Get accommodations and transport for the first itinerary day
+  const firstItineraryId = itinerary?.[0]?.id || '';
+  const { data: accommodation } = useAccommodationsByItineraryId(firstItineraryId);
+  const { data: transports } = useTransportByItineraryId(firstItineraryId);
 
   // Get related data
   const destination = destinations.find((d: Destination) => d.id === packageData.destinationId);
-  const accommodation = getAccommodationByPackageId(packageData.id);
-  const tourOperator = tourOperators.find(t => t.id === packageData.tourOperatorId);
-  const rating = getPackageRating(packageData.id);
-  const transports = getTransportByPackageId(packageData.id);
   
   const handleCompareClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -151,7 +156,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
           </div>
           
           <div className="flex flex-wrap gap-2 mb-3">
-            {transports && transports?.length> 0  && transports.filter(a => a.type === 'flight')&& (
+            {transports && transports.length > 0 && transports.some(t => t.type === 'flight') && (
               <span className="badge bg-primary-50 text-primary-600 flex items-center">
                 <Plane className="h-3 w-3 mr-1" />
                 Transport

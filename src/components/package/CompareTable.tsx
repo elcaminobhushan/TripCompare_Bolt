@@ -4,9 +4,10 @@ import { X, Star, Check } from 'lucide-react';
 import { useCompare } from '../../hooks/useCompare';
 import { formatPrice, calculateFinalPrice } from '../../utils/formatters';
 import { useDestinations } from '@/hooks/useDestinations';
-import { getTransportByPackageId } from '../../data/transport';
-import { getAccommodationByPackageId } from '../../data/accommodations';
-import {getPackageRating} from '../../data/reviews';
+import { useTransportByItineraryId } from '../../hooks/useTransport';
+import { useAccommodationsByItineraryId } from '../../hooks/useAccommodations';
+import { usePackageRating } from '../../hooks/useReviews';
+import { usePackageItinerary } from '../../hooks/useItineraries';
 
 import { Plane, Bus, Train, Ship, Car } from "lucide-react"; 
 
@@ -106,44 +107,17 @@ const CompareTable: React.FC<CompareTableProps> = ({ packages }) => {
           <tr>
             <td className="px-6 py-4 font-medium">Rating</td>
             {packages.map((pkg) => (
-              <td key={pkg.id} className="px-6 py-4">
-                <div className="flex items-center">
-                  <div className="flex mr-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(getPackageRating(pkg.id).rating) 
-                            ? 'text-amber-400 fill-amber-400' 
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="ml-1">{getPackageRating(pkg.id).rating}</span>
-                  <span className="ml-1 text-gray-500">({getPackageRating(pkg.id).count})</span>
-                </div>
-              </td>
+              <PackageRatingCell key={pkg.id} packageId={pkg.id} />
             ))}
           </tr>
           
           {/* Accommodation */}
           <tr>
-          <td className="px-6 py-4 font-medium">Accommodation</td>
-          {packages.map((pkg) => {
-            const accommodations = getAccommodationByPackageId(pkg.id);
-            const acc = accommodations?.[0]; // first item
-            return (
-              <td key={pkg.id} className="px-6 py-4">
-                {acc && (
-                  <div>
-                    <div className="font-medium">{acc.name}</div>
-                  </div>
-                )}
-              </td>
-            );
-          })}
-        </tr>
+            <td className="px-6 py-4 font-medium">Accommodation</td>
+            {packages.map((pkg) => (
+              <PackageAccommodationCell key={pkg.id} packageId={pkg.id} />
+            ))}
+          </tr>
 
           
           {/* Meals */}
@@ -185,19 +159,7 @@ const CompareTable: React.FC<CompareTableProps> = ({ packages }) => {
           <tr>
             <td className="px-6 py-4 font-medium">Transportation</td>
             {packages.map((pkg) => {
-              const transports = getTransportByPackageId(pkg.id); // returns Transport[]
-              const types = transports ? [...new Set(transports.map(t => t.type))] : [];// unique types
-
-              return (
-                <td key={pkg.id} className="px-6 py-4">
-                  {types.map((type, index) => (
-                    <div key={index} className="flex items-center mb-1">
-                      {getTransportIcon(type)}
-                      <span className="font-medium">{type}</span>
-                    </div>
-                  ))}
-                </td>
-              );
+              <PackageTransportCell key={pkg.id} packageId={pkg.id} />
             })}
           </tr>
           
@@ -224,6 +186,67 @@ const CompareTable: React.FC<CompareTableProps> = ({ packages }) => {
         </tbody>
       </table>
     </div>
+  );
+};
+
+// Helper components for complex cells
+const PackageRatingCell: React.FC<{ packageId: string }> = ({ packageId }) => {
+  const { data: rating } = usePackageRating(packageId);
+  
+  return (
+    <td className="px-6 py-4">
+      <div className="flex items-center">
+        <div className="flex mr-1">
+          {[...Array(5)].map((_, i) => (
+            <Star 
+              key={i}
+              className={`h-4 w-4 ${
+                i < Math.floor(rating.rating) 
+                  ? 'text-amber-400 fill-amber-400' 
+                  : 'text-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+        <span className="ml-1">{rating.rating}</span>
+        <span className="ml-1 text-gray-500">({rating.count})</span>
+      </div>
+    </td>
+  );
+};
+
+const PackageAccommodationCell: React.FC<{ packageId: string }> = ({ packageId }) => {
+  const { data: itinerary } = usePackageItinerary(packageId);
+  const firstItineraryId = itinerary?.[0]?.id || '';
+  const { data: accommodations } = useAccommodationsByItineraryId(firstItineraryId);
+  const acc = accommodations?.[0];
+  
+  return (
+    <td className="px-6 py-4">
+      {acc && (
+        <div>
+          <div className="font-medium">{acc.name}</div>
+        </div>
+      )}
+    </td>
+  );
+};
+
+const PackageTransportCell: React.FC<{ packageId: string }> = ({ packageId }) => {
+  const { data: itinerary } = usePackageItinerary(packageId);
+  const firstItineraryId = itinerary?.[0]?.id || '';
+  const { data: transports } = useTransportByItineraryId(firstItineraryId);
+  const types = transports ? [...new Set(transports.map(t => t.type))] : [];
+  
+  return (
+    <td className="px-6 py-4">
+      {types.map((type, index) => (
+        <div key={index} className="flex items-center mb-1">
+          {getTransportIcon(type)}
+          <span className="font-medium">{type}</span>
+        </div>
+      ))}
+    </td>
   );
 };
 
