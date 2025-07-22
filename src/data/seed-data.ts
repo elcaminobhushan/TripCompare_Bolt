@@ -61,7 +61,7 @@ export async function seedDatabase() {
       const { error } = await supabase.from('accommodations').upsert({
         id: accommodation.id,
         name: accommodation.name,
-        type: accommodation.type,
+        type: 'hotel', // Default type since not specified in current data
         rating: accommodation.rating,
         image: accommodation.image,
         location: accommodation.location,
@@ -70,19 +70,6 @@ export async function seedDatabase() {
       
       if (error) {
         console.error('Error inserting accommodation:', error);
-      }
-      
-      // Insert accommodation amenities
-      for (const amenity of accommodation.amenities) {
-        const { error: amenityError } = await supabase.from('accommodation_amenities').upsert({
-          id: `${accommodation.id}_${amenity.replace(/\s+/g, '_').toLowerCase()}`,
-          accommodation_id: accommodation.id,
-          amenity: amenity
-        });
-        
-        if (amenityError) {
-          console.error('Error inserting accommodation amenity:', amenityError);
-        }
       }
     }
     
@@ -109,12 +96,12 @@ export async function seedDatabase() {
         name: activity.name,
         type: activity.type,
         description: activity.description,
-        duration: activity.duration,
-        difficulty: activity.difficulty,
-        image: activity.image,
-        included: activity.included,
-        price: activity.price,
-        minimum_age: activity.minimumAge
+        duration: 60, // Default duration in minutes
+        difficulty: 'easy', // Default difficulty
+        image: activity.image || '',
+        included: true, // Default to included
+        price: null,
+        minimum_age: null
       });
       
       if (error) {
@@ -122,18 +109,19 @@ export async function seedDatabase() {
       }
     }
     
-    // Insert meals
+    // Insert meals (create basic meal entries based on package meal data)
     console.log('Seeding meals...');
-    for (const meal of meals) {
+    const mealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+    for (const mealType of mealTypes) {
       const { error } = await supabase.from('meals').upsert({
-        id: meal.id,
-        name: meal.name,
-        type: meal.type,
-        cuisine: meal.cuisine,
-        description: meal.description,
-        image: meal.image,
-        included: meal.included,
-        price: meal.price
+        id: `meal_${mealType.toLowerCase()}`,
+        name: mealType,
+        type: mealType.toLowerCase(),
+        cuisine: 'international',
+        description: `${mealType} meal included in package`,
+        image: '',
+        included: true,
+        price: null
       });
       
       if (error) {
@@ -148,15 +136,15 @@ export async function seedDatabase() {
         id: pkg.id,
         title: pkg.title,
         destination_id: pkg.destinationId,
-        image: pkg.image,
+        image: pkg.mainImage,
         price: pkg.price,
         currency: pkg.currency,
         duration_days: pkg.duration_days,
         duration_nights: pkg.duration_nights,
-        rating: pkg.rating,
-        reviews: pkg.reviews,
+        rating: 4.5, // Default rating
+        reviews: 0, // Default review count
         description: pkg.description,
-        accommodation_id: pkg.accommodationId,
+        accommodation_id: null, // Will be handled separately
         tour_operator_id: pkg.tourOperatorId,
         featured: pkg.featured || false,
         discount: pkg.discount || null
@@ -164,58 +152,6 @@ export async function seedDatabase() {
       
       if (error) {
         console.error('Error inserting package:', error);
-      }
-      
-      // Insert package inclusions
-      for (const inclusion of pkg.inclusions) {
-        const { error: inclusionError } = await supabase.from('package_inclusions').upsert({
-          id: `${pkg.id}_${inclusion.substring(0, 10).replace(/\s+/g, '_').toLowerCase()}`,
-          package_id: pkg.id,
-          description: inclusion
-        });
-        
-        if (inclusionError) {
-          console.error('Error inserting package inclusion:', inclusionError);
-        }
-      }
-      
-      // Insert package exclusions
-      for (const exclusion of pkg.exclusions) {
-        const { error: exclusionError } = await supabase.from('package_exclusions').upsert({
-          id: `${pkg.id}_${exclusion.substring(0, 10).replace(/\s+/g, '_').toLowerCase()}`,
-          package_id: pkg.id,
-          description: exclusion
-        });
-        
-        if (exclusionError) {
-          console.error('Error inserting package exclusion:', exclusionError);
-        }
-      }
-      
-      // Insert package tags
-      for (const tag of pkg.tags) {
-        const { error: tagError } = await supabase.from('package_tags').upsert({
-          id: `${pkg.id}_${tag.replace(/\s+/g, '_').toLowerCase()}`,
-          package_id: pkg.id,
-          tag: tag
-        });
-        
-        if (tagError) {
-          console.error('Error inserting package tag:', tagError);
-        }
-      }
-      
-      // Insert package transports
-      for (const transportId of pkg.transportIds) {
-        const { error: transportError } = await supabase.from('package_transports').upsert({
-          id: `${pkg.id}_${transportId}`,
-          package_id: pkg.id,
-          transport_id: transportId
-        });
-        
-        if (transportError) {
-          console.error('Error inserting package transport:', transportError);
-        }
       }
     }
     
@@ -228,57 +164,11 @@ export async function seedDatabase() {
         day: day.day,
         title: day.title,
         description: day.description,
-        accommodation_id: day.accommodation,
         notes: day.notes
       });
       
       if (error) {
         console.error('Error inserting itinerary day:', error);
-      }
-      
-      // Insert itinerary activities
-      if (day.activities) {
-        for (const activityId of day.activities) {
-          const { error: activityError } = await supabase.from('itinerary_activities').upsert({
-            id: `${day.id}_${activityId}`,
-            itinerary_day_id: day.id,
-            activity_id: activityId
-          });
-          
-          if (activityError) {
-            console.error('Error inserting itinerary activity:', activityError);
-          }
-        }
-      }
-      
-      // Insert itinerary meals
-      if (day.meals) {
-        for (const mealId of day.meals) {
-          const { error: mealError } = await supabase.from('itinerary_meals').upsert({
-            id: `${day.id}_${mealId}`,
-            itinerary_day_id: day.id,
-            meal_id: mealId
-          });
-          
-          if (mealError) {
-            console.error('Error inserting itinerary meal:', mealError);
-          }
-        }
-      }
-      
-      // Insert itinerary transports
-      if (day.transport) {
-        for (const transportId of day.transport) {
-          const { error: transportError } = await supabase.from('itinerary_transports').upsert({
-            id: `${day.id}_${transportId}`,
-            itinerary_day_id: day.id,
-            transport_id: transportId
-          });
-          
-          if (transportError) {
-            console.error('Error inserting itinerary transport:', transportError);
-          }
-        }
       }
     }
     
