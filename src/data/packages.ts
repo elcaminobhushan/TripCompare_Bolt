@@ -176,53 +176,6 @@ export const packages: Package[] = [
     ],
     "itineraryPdf": "Thailand_Bangkok_Krabi_Phuket_8D_Itinerary.pdf",
     "meal" : ["Breakfast","Lunch","Dinner"]
-  },
-  {
-    "id": "p3",
-    "title": "Thailand Solo & Party Group Tour",
-    "destinationId": "d1",
-    mainImage : "https://d2qa7a8q0vuocm.cloudfront.net/images/12073820231104222013.png",
-    "images": ["https://d2qa7a8q0vuocm.cloudfront.net/images/12073820231104222013.png"],
-    "price": 51999,
-    "currency": "INR",
-    "duration_days": 8,
-    "duration_nights": 7,
-    "description": "Unleash your party spirit and solo adventure vibes on this epic 8-day Thailand group tour! Explore Phuket, Koh Samui, Koh Phangan and Krabi — with yacht parties, fire shows, full moon madness, and a squad of like-minded travelers.",
-    "tourOperatorId": "to3",
-    "inclusions": [
-      "7 Nights accommodation in 4-star hotels located in city-centre",
-      "Airport pickup & drop",
-      "Sundowner Yacht Party",
-      "Intercity transportation through ferries and private transfers",
-      "All activities mentioned in the itinerary",
-      "Full Moon Party access",
-      "Travel Insurance",
-      "Entry fees and local guide charges",
-      "Experienced trip leader and local guides"
-    ],
-    "exclusions": [
-      "International flights & Visa",
-      "Personal shopping & drinks or any other expenses",
-      "Meals not mentioned",
-      "Scuba diving or extra water sports",
-      "Entry fees/cover charges to clubs, pubs etc.",
-      "Any expense due to unforeseen circumstances",
-      "Any tips given to local guides, drivers etc."
-    ],
-    "featured": true,
-    "departureLocations": ["Delhi", "Mumbai", "Bangalore"],
-    "tags": [
-      "Solo Travel",
-      "Group Tour",
-      "Beach Parties",
-      "Full Moon Party",
-      "Island Hopping",
-      "Nightlife",
-      "Indian Travelers",
-      "Digital Nomads"
-    ],
-    "itineraryPdf": "Thailand_Solo_Party_8D_Itinerary.pdf",
-    "meal" : ["Breakfast","Lunch","Dinner"]
   }
   
   

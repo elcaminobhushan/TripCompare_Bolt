@@ -25,9 +25,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
   const isInCompareList = useCompareStore((state) => state.isInCompareList(packageData.id));
   
   const { data: destinations, isLoading, error } = useDestinations();
-  if (isLoading) return <p>Loading destinations...</p>;
-  if (error) return <p>Error loading destinations</p>;
-  
+
   const { data: tourOperator } = useTourOperator(packageData.tourOperatorId);
   const { data: rating } = usePackageRating(packageData.id);
   const { data: itinerary } = usePackageItinerary(packageData.id);
@@ -39,6 +37,10 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
 
   // Get related data
   const destination = destinations.find((d: Destination) => d.id === packageData.destinationId);
+
+  if (isLoading) return <p>Loading destinations...</p>;
+  if (error) return <p>Error loading destinations</p>;
+  
   
   const handleCompareClick = (e: React.MouseEvent) => {
     e.preventDefault();
