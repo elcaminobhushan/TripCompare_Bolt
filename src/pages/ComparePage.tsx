@@ -40,19 +40,19 @@ const ComparePage: React.FC = () => {
   const navigate = useNavigate();
   const compareList = useCompareStore((state) => state.compareList);
   const removeFromCompare = useCompareStore((state) => state.removeFromCompare);
-  const { data: allPackages } = usePackages();
-  const { data: destinations } = useDestinations();
+  const { data: allPackages, isLoading: packagesLoading } = usePackages();
+  const { data: destinations, isLoading: destinationsLoading } = useDestinations();
+  
   
   const [packages, setPackages] = useState<Package[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = packagesLoading || destinationsLoading;
+
 
   useEffect(() => {
-    setIsLoading(true);
     const selectedPackages = compareList
       .map(id => allPackages?.find(pkg => pkg.id === id))
       .filter((pkg): pkg is Package => pkg !== undefined);
     setPackages(selectedPackages);
-    setIsLoading(false);
   }, [compareList, allPackages]);
 
   if (isLoading) {

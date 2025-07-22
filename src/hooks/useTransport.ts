@@ -29,7 +29,7 @@ export function useTransport() {
         }
         
         const { data: transport, error } = await supabase
-          .from('transports')
+          .from('transport')
           .select('*');
 
         if (error) throw error;
@@ -82,9 +82,10 @@ export function useTransportByItineraryId(itenaryId: string) {
         }
         
         const { data: transport, error } = await supabase
-          .from('transports')
-          .select('*')
-          .ilike('itenary_id', `%${itenaryId}%`);
+        .from('transport')
+        .select('*')
+        .ilike('itenary_id', `%${itenaryId}%`); // ✅ fixed spelling
+      
 
         if (error) throw error;
         

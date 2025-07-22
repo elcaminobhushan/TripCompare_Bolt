@@ -171,12 +171,15 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
               </span>
             )}
 
-            {packageData.inclusions.some(i => i.toLowerCase().includes('breakfast')) && (
+            {packageData.inclusions?.some(
+              (i) => typeof i === 'string' && i.toLowerCase().includes('breakfast')
+            ) && (
               <span className="badge bg-primary-50 text-primary-600 flex items-center">
                 <Coffee className="h-3 w-3 mr-1" />
                 Breakfast
               </span>
             )}
+
           </div>
         </div>
         

@@ -22,9 +22,7 @@ export function usePackages() {
         const { data: packages, error } = await supabase
         .from('packages')
         .select(`
-          *,
-          tour_operator:tour_operators(*),
-          destination:destinations(*)
+          *
         `);
 
 
