@@ -3,59 +3,51 @@ import { supabase, isSupabaseConnected } from '../lib/supabase';
 import type { Package } from '../types';
 import { packages as localPackages } from '../data/packages';
 
+// ✅ Utility to transform DB package into frontend-friendly type
+const transformPackage = (pkg: any): Package => ({
+  id: pkg.id,
+  title: pkg.title,
+  destinationId: pkg.destination_id,
+  mainImage: pkg.main_image,
+  images: pkg.images,
+  price: pkg.price,
+  currency: pkg.currency,
+  duration_days: pkg.duration_days,
+  duration_nights: pkg.duration_nights,
+  description: pkg.description,
+  tourOperatorId: pkg.tour_operator_id,
+  inclusions: (pkg.inclusions ?? []).map((i: any) => i.description),
+  exclusions: (pkg.exclusions ?? []).map((e: any) => e.description),
+  featured: pkg.featured,
+  discount: pkg.discount,
+  departureLocations: pkg.departureLocations,
+  itineraryPdf: pkg.itineraryPdf,
+  meal: pkg.meal,
+  tags: pkg.tags
+});
+
 export function usePackages() {
   const [data, setData] = useState<Package[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); 
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     async function fetchPackages() {
       try {
         setIsLoading(true);
-        
-        // If Supabase is not connected, use local data
         if (!isSupabaseConnected()) {
           setData(localPackages);
+          setIsLoading(false);
           return;
         }
-        
-        const { data: packages, error } = await supabase
-        .from('packages')
-        .select(`
-          *
-        `);
 
-
+        const { data: packages, error } = await supabase.from('packages').select('*');
         if (error) throw error;
-        
-        // Transform the data to match our Package type
-        const transformedPackages = packages.map(pkg => ({
-          id: pkg.id,
-          title: pkg.title,
-          destinationId: pkg.destination_id,
-          mainImage: pkg.mainImage,
-          images: pkg.images,
-          price: pkg.price,
-          currency: pkg.currency,
-          duration_days: pkg.duration_days,
-          duration_nights: pkg.duration_nights,
-          description: pkg.description,
-          tags : pkg.tags,
-          tourOperatorId: pkg.tour_operator_id,
-          inclusions: pkg.inclusions.map((i: any) => i.description),
-          exclusions: pkg.exclusions.map((e: any) => e.description),
-          featured: pkg.featured,
-          discount: pkg.discount,
-          departureLocations: pkg.departureLocations,
-          itineraryPdf: pkg.itineraryPdf,
-          meal : pkg.meal
-        }));
-
-        setData(transformedPackages);
+        const transformed = packages.map(transformPackage);
+        setData(transformed);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching packages:', err);
-        // Fallback to local data on error
+        setError(err instanceof Error ? err : new Error('Unknown error'));
         setData(localPackages);
       } finally {
         setIsLoading(false);
@@ -75,78 +67,42 @@ export function usePackage(id: string) {
 
   useEffect(() => {
     if (!id) return;
-    
+
     async function fetchPackage() {
       try {
         setIsLoading(true);
-        
-        // If Supabase is not connected, use local data
         if (!isSupabaseConnected()) {
           const pkg = localPackages.find(p => p.id === id);
-          if (pkg) {
-            setData(pkg);
-          }
+          setData(pkg || null);
+          setIsLoading(false);
           return;
         }
-        
+
         const { data: pkg, error } = await supabase
           .from('packages')
           .select(`
-            *,
-            destination:destinations(*),
-            accommodation:accommodations(*),
-            tour_operator:tour_operators(*),
-            inclusions:package_inclusions(description),
-            exclusions:package_exclusions(description),
-            tags:package_tags(tag),
-            transports:package_transports(transport:transports(*))
+            *
           `)
           .eq('id', id)
           .single();
 
         if (error) throw error;
-        
-        // Transform the data to match our Package type
-        const transformedPackage = {
-          id: pkg.id,
-          title: pkg.title,
-          destinationId: pkg.destination_id,
-          mainImage: pkg.mainImage,
-          images: pkg.images,
-          price: pkg.price,
-          currency: pkg.currency,
-          duration_days: pkg.duration_days,
-          duration_nights: pkg.duration_nights,
-          description: pkg.description,
-          tourOperatorId: pkg.tour_operator_id,
-          inclusions: pkg.inclusions.map((i: any) => i.description),
-          exclusions: pkg.exclusions.map((e: any) => e.description),
-          featured: pkg.featured,
-          discount: pkg.discount,
-          departureLocations: pkg.departureLocations,
-          itineraryPdf: pkg.itineraryPdf,
-          meal : pkg.meal,
-          tags : pkg.tags
-        };
-
-        setData(transformedPackage);
+        setData(transformPackage(pkg));
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching package:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {
         setIsLoading(false);
       }
     }
 
-    if (id) {
-      fetchPackage();
-    }
+    fetchPackage();
   }, [id]);
 
   return { data, isLoading, error };
 }
 
-export function useRelatedPackages(id: string, limit: number = 3) {
+export function useRelatedPackages(id: string, limit = 3) {
   const [data, setData] = useState<Package[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -155,62 +111,31 @@ export function useRelatedPackages(id: string, limit: number = 3) {
     async function fetchRelatedPackages() {
       try {
         setIsLoading(true);
-        
-        // First get the destination_id of the current package
-        const { data: currentPackage, error: packageError } = await supabase
+
+        const { data: current, error: err1 } = await supabase
           .from('packages')
           .select('destination_id')
           .eq('id', id)
           .single();
 
-        if (packageError) throw packageError;
+        if (err1) throw err1;
 
-        // Then get other packages with the same destination_id
-        const { data: relatedPackages, error } = await supabase
+        const { data: related, error: err2 } = await supabase
           .from('packages')
           .select(`
-            *,
-            destination:destinations(*),
-            accommodation:accommodations(*),
-            tour_operator:tour_operators(*),
-            inclusions:package_inclusions(description),
-            exclusions:package_exclusions(description),
-            tags:package_tags(tag),
-            transports:package_transports(transport:transports(*))
+            *
           `)
-          .eq('destination_id', currentPackage.destination_id)
+          .eq('destination_id', current.destination_id)
           .neq('id', id)
           .limit(limit);
 
-        if (error) throw error;
-        
-        // Transform the data to match our Package type
-        const transformedPackages = relatedPackages.map(pkg => ({
-          id: pkg.id,
-          title: pkg.title,
-          destinationId: pkg.destination_id,
-          mainImage: pkg.mainImage,
-          images: pkg.images,
-          price: pkg.price,
-          currency: pkg.currency,
-          duration_days: pkg.duration_days,
-          duration_nights: pkg.duration_nights,
-          description: pkg.description,
-          tourOperatorId: pkg.tour_operator_id,
-          inclusions: pkg.inclusions.map((i: any) => i.description),
-          exclusions: pkg.exclusions.map((e: any) => e.description),
-          featured: pkg.featured,
-          discount: pkg.discount,
-          departureLocations: pkg.departureLocations,
-          itineraryPdf: pkg.itineraryPdf,
-          meal : pkg.meal,
-          tags : pkg.tags
-        }));
+        if (err2) throw err2;
 
-        setData(transformedPackages);
+        const transformed = related.map(transformPackage);
+        setData(transformed);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching related packages:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {
         setIsLoading(false);
       }
@@ -233,21 +158,13 @@ export function useFilteredPackages(filters: any) {
     async function fetchFilteredPackages() {
       try {
         setIsLoading(true);
-        
+
         let query = supabase
           .from('packages')
           .select(`
-            *,
-            destination:destinations(*),
-            accommodation:accommodations(*),
-            tour_operator:tour_operators(*),
-            inclusions:package_inclusions(description),
-            exclusions:package_exclusions(description),
-            tags:package_tags(tag),
-            transports:package_transports(transport:transports(*))
+            *
           `);
 
-        // Apply filters
         if (filters.priceRange) {
           query = query
             .gte('price', filters.priceRange[0])
@@ -268,37 +185,14 @@ export function useFilteredPackages(filters: any) {
           query = query.eq('destination_id', filters.destinationId);
         }
 
-        const { data: filteredPackages, error } = await query;
-
+        const { data: result, error } = await query;
         if (error) throw error;
-        
-        // Transform the data to match our Package type
-        const transformedPackages = filteredPackages.map(pkg => ({
-          id: pkg.id,
-          title: pkg.title,
-          destinationId: pkg.destination_id,
-          mainImage: pkg.mainImage,
-          images: pkg.images,
-          price: pkg.price,
-          currency: pkg.currency,
-          duration_days: pkg.duration_days,
-          duration_nights: pkg.duration_nights,
-          description: pkg.description,
-          tourOperatorId: pkg.tour_operator_id,
-          inclusions: pkg.inclusions.map((i: any) => i.description),
-          exclusions: pkg.exclusions.map((e: any) => e.description),
-          featured: pkg.featured,
-          discount: pkg.discount,
-          departureLocations: pkg.departureLocations,
-          itineraryPdf: pkg.itineraryPdf,
-          meal : pkg.meal,
-          tags : pkg.tags
-        }));
 
-        setData(transformedPackages);
+        const transformed = result.map(transformPackage);
+        setData(transformed);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching filtered packages:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {
         setIsLoading(false);
       }
