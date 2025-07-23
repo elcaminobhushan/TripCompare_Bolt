@@ -64,46 +64,60 @@ const ActivitiesDayCard: React.FC<{
       </button>
 
       {isExpanded && (
-  <div className="p-4 bg-gray-50 border-t border-gray-100">
+        <div className="p-6 bg-gradient-to-br from-orange-50 to-amber-50 border-t border-gray-100">
     {activities && activities.length > 0 ? (
-      <div className="space-y-4">
+            <div className="space-y-6">
         {activities.map((activity) => (
           <div
             key={activity.id}
-            className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col sm:flex-row"
+                className="bg-white rounded-xl shadow-md overflow-hidden border border-orange-100"
           >
-            {/* Image */}
-            {activity.image && (
-              <img
-                src={activity.image}
-                alt={activity.name}
-                className="w-full sm:w-60 h-44 sm:h-auto object-cover flex-shrink-0"
-              />
-            )}
+                <div className="flex flex-col lg:flex-row">
+                  {/* Image Section */}
+                  {activity.image && (
+                    <div className="lg:w-1/3">
+                      <img
+                        src={activity.image}
+                        alt={activity.name}
+                        className="w-full h-48 lg:h-full object-cover"
+                      />
+                    </div>
+                  )}
 
-            {/* Content */}
-            <div className="p-4 flex flex-col justify-center gap-2">
-              <h4 className="text-lg font-semibold text-gray-800">
+                  {/* Content Section */}
+                  <div className={`p-6 flex flex-col justify-center ${activity.image ? 'lg:w-2/3' : 'w-full'}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1">
+                        <h4 className="text-xl font-bold text-gray-800 mb-2">
                 {activity.name}
               </h4>
 
-              {activity.type && (
-                <span className="text-xs text-primary-700 bg-primary-100 rounded-full px-2 py-0.5 w-fit">
-                  {activity.type}
-                </span>
-              )}
+                        {activity.type && (
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium capitalize">
+                              {activity.type.replace('-', ' ')}
+                            </span>
+                          </div>
+                        )}
 
-              {activity.description && (
-                <p className="text-sm text-gray-600 whitespace-pre-line">
+                        {activity.description && (
+                          <div className="bg-gray-50 rounded-lg p-4">
+                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                   {activity.description}
                 </p>
-              )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
             </div>
-          </div>
         ))}
       </div>
     ) : (
-      <p className="text-sm text-gray-500">No activities listed for this day.</p>
+            <div className="bg-white rounded-lg p-6 text-center">
+              <p className="text-gray-500">No activities listed for this day.</p>
+            </div>
     )}
   </div>
 )}

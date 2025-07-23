@@ -48,23 +48,40 @@ const Transport: React.FC<TransportProps> = ({ packageData }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {Object.entries(transportGroups).map(([type, list]) => (
-        <div key={type} className="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
-          <div className="flex items-center gap-2 mb-3">
+        <div key={type} className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-md p-6 border border-green-100">
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center gap-3 mb-4">
             {getTransportIcon(type)}
-            <h3 className="text-base font-semibold capitalize text-gray-800">{type}</h3>
+              <h3 className="text-lg font-bold capitalize text-gray-800">{type}</h3>
+              <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                {list.length} {list.length === 1 ? 'option' : 'options'}
+              </span>
           </div>
-          <ul className="space-y-2 text-sm text-gray-700 pl-1">
+            
+            <div className="space-y-3">
             {list.map((t, i) => (
-              <li key={i} className="flex items-start">
-                <span className="leading-snug">
-                  {t.name ? <strong>{t.name}: </strong> : ''}
-                  {t.source} → {t.destination}
-                </span>
-              </li>
+                <div key={i} className="bg-gray-50 rounded-lg p-3 border-l-4 border-green-400">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      {t.name && (
+                        <h4 className="font-semibold text-gray-800 mb-1">{t.name}</h4>
+                      )}
+                      <div className="flex items-center text-sm text-gray-600">
+                        <span className="font-medium">{t.source}</span>
+                        <span className="mx-2 text-green-500">→</span>
+                        <span className="font-medium">{t.destination}</span>
+                      </div>
+                      {t.description && (
+                        <p className="text-xs text-gray-500 mt-1">{t.description}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
             ))}
-          </ul>
+            </div>
+          </div>
         </div>
       ))}
     </div>

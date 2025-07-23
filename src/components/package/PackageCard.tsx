@@ -79,7 +79,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
 
   return (
     <div 
-      className={`bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full transition hover:shadow-lg w-full max-w-[320px] sm:max-w-sm flex-shrink-0 mx-auto ${className}`}
+      className={`bg-white rounded-xl shadow-md overflow-hidden flex flex-col h-full transition hover:shadow-lg w-full ${className}`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -89,7 +89,7 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
         <img 
           src={packageData.mainImage} 
           alt={packageData.title}
-          className="h-40 sm:h-48 w-full object-cover"
+          className="h-48 w-full object-cover"
         />
 
         <button 
@@ -107,8 +107,8 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
         )}
       </div>
 
-      <div className="p-4 flex flex-col flex-1">
-        <h3 className="text-base sm:text-lg font-semibold mb-1 line-clamp-2 leading-tight">{packageData.title}</h3>
+      <div className="p-5 flex flex-col flex-1">
+        <h3 className="text-lg font-semibold mb-2 line-clamp-2 leading-tight">{packageData.title}</h3>
 
         {tourOperator && (
           <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
@@ -159,13 +159,14 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
           )}
         </div>
 
-        <div className="mt-auto pt-3 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="mt-auto pt-4 border-t border-gray-200">
           <div className="flex items-center gap-1">
             <span className="text-lg font-bold text-gray-900">{formatPrice(calculateFinalPrice(packageData))}</span>
             <span className="text-sm text-gray-500">per person</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between gap-2 mt-3">
+            <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadClick}
               className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -183,11 +184,12 @@ const PackageCard: React.FC<PackageCardProps> = ({ packageData, className = '' }
             >
               {isInCompareList ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
             </button>
+            </div>
 
             <Link
               to={`/package/${packageData.id}`}
               onClick={handleViewDetailsClick}
-              className="btn-primary px-4 py-2 text-sm"
+              className="btn-primary px-6 py-2 text-sm"
             >
               View
             </Link>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Package } from '../../../types';
-import { ChevronDown, ChevronUp, Star } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, MapPin } from 'lucide-react';
 import { usePackageItinerary } from '../../../hooks/useItineraries';
 import { useAccommodationsByItineraryId, useAccommodationsByItineraryIds } from '../../../hooks/useAccommodations';
 
@@ -86,23 +86,49 @@ const StaysDayCard: React.FC<{
       </button>
 
       {isExpanded && accommodations.map((acc) => (
-        <div key={acc.id} className="p-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row gap-5 items-start">
+        <div key={acc.id} className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-t border-gray-200">
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="flex flex-col lg:flex-row">
+              {/* Image Section */}
+              <div className="lg:w-1/3">
             <img
               src={acc.image || '/default-hotel.jpg'}
               alt={acc.name}
-              className="w-full md:w-64 h-44 object-cover rounded-lg shadow"
+                  className="w-full h-48 lg:h-full object-cover"
             />
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center gap-2">
-                <h4 className="font-semibold text-lg text-gray-800">{acc.name}</h4>
-                <div className="flex">{renderStarRating(acc.rating)}</div>
               </div>
-              {acc.description && (
-                <p className="text-sm text-gray-600 mt-1 whitespace-pre-line">
+              
+              {/* Content Section */}
+              <div className="lg:w-2/3 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h4 className="font-bold text-xl text-gray-800">{acc.name}</h4>
+                      <div className="flex items-center gap-1">
+                        {renderStarRating(acc.rating)}
+                        {acc.rating && (
+                          <span className="text-sm text-gray-600 ml-1">({acc.rating} stars)</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {acc.location && (
+                      <p className="text-sm text-gray-500 mb-3 flex items-center">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {acc.location}
+                      </p>
+                    )}
+                    
+                    {acc.description && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                   {acc.description}
                 </p>
-              )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
