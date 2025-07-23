@@ -40,7 +40,7 @@ const PackageListingPage: React.FC = () => {
   const { compareList } = useCompare();
   
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 500000],
+    priceRange: [0, 100000],
     duration: [1, 14],
     rating: null,
     travelTheme: [],
@@ -59,32 +59,40 @@ const PackageListingPage: React.FC = () => {
   const handleSearch = () => {
     let results = [...(packages || [])];
     
+    // Apply destination filter first
     if (activeDestinationId !== 'all') {
       results = results.filter(pkg => pkg.destinationId === activeDestinationId);
     }
 
+    // Apply search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       results = results.filter(pkg =>
         pkg.title.toLowerCase().includes(query) ||
-        destinations.find(d => d.id === pkg.destinationId)?.name.toLowerCase().includes(query)
+        destinations?.find(d => d.id === pkg.destinationId)?.name.toLowerCase().includes(query)
       );
     }
 
+    // Apply filters
     results = results.filter(pkg => {
       const matchesPrice = pkg.price >= filters.priceRange[0] && pkg.price <= filters.priceRange[1];
       const matchesDuration = pkg.duration_days >= filters.duration[0] && pkg.duration_days <= filters.duration[1];
       
       // Travel theme filtering based on package tags
       const matchesTravelTheme = filters.travelTheme.length === 0 || 
-        (pkg.tags && filters.travelTheme.some(theme => pkg.tags.includes(theme)));
+        (pkg.tags && pkg.tags.length > 0 && filters.travelTheme.some(theme => 
+          pkg.tags.some(tag => tag.toLowerCase().includes(theme.toLowerCase()))
+        ));
       
       // Inclusions filtering based on package inclusions
       const matchesInclusions = filters.inclusions.length === 0 ||
-        (pkg.inclusions && filters.inclusions.some(inclusion => 
-          pkg.inclusions.some(pkgInclusion => 
-            pkgInclusion.toLowerCase().includes(inclusion.toLowerCase())
-          )
+        (pkg.inclusions && pkg.inclusions.length > 0 && filters.inclusions.some(inclusion => 
+          pkg.inclusions.some(pkgInclusion => {
+            if (typeof pkgInclusion === 'string') {
+              return pkgInclusion.toLowerCase().includes(inclusion.toLowerCase());
+            }
+            return false;
+          })
         ));
       
       return matchesPrice && matchesDuration && matchesTravelTheme && matchesInclusions;
@@ -94,22 +102,10 @@ const PackageListingPage: React.FC = () => {
   };
 
   useEffect(() => {
-    let isMounted = true;
-  
-    const runSearch = async () => {
-      try {
-        await handleSearch();
-      } catch (err) {
-        if (isMounted) console.error(err);
-      }
-    };
-  
-    runSearch();
-  
-    return () => {
-      isMounted = false;
-    };
-  }, [activeDestinationId, filters, searchQuery]);
+    if (packages && packages.length > 0) {
+      handleSearch();
+    }
+  }, [activeDestinationId, filters, searchQuery, packages, destinations]);
   
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
@@ -242,9 +238,9 @@ const PackageListingPage: React.FC = () => {
                 <button
                   onClick={() => {
                     setFilters({
-                      priceRange: [0, 500000],
+                      priceRange: [0, 100000],
                       duration: [1, 14],
-                      travelTheme:[],
+                      travelTheme: [],
                       rating: null,
                       inclusions: []
                     });

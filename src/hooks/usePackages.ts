@@ -49,7 +49,6 @@ export function usePackages() {
         if (!isSupabaseConnected()) {
           setData(localPackages);
           dataCache.set(cacheKey, localPackages);
-          setIsLoading(false);
           return;
         }
 

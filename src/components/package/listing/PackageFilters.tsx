@@ -97,7 +97,7 @@ const PackageFilters: React.FC<PackageFiltersProps> = ({
               <input
                 type="range"
                 min="0"
-                max="500000"
+                max="100000"
                 step="1000"
                 value={filters.priceRange[1]}
                 onChange={(e) => onFilterChange('priceRange', [filters.priceRange[0], parseInt(e.target.value)])}
