@@ -94,8 +94,23 @@ const PackageListingPage: React.FC = () => {
   };
 
   useEffect(() => {
-    handleSearch();
+    let isMounted = true;
+  
+    const runSearch = async () => {
+      try {
+        await handleSearch();
+      } catch (err) {
+        if (isMounted) console.error(err);
+      }
+    };
+  
+    runSearch();
+  
+    return () => {
+      isMounted = false;
+    };
   }, [activeDestinationId, filters, searchQuery]);
+  
 
   const handleFilterChange = (filterType: keyof FilterState, value: any) => {
     setFilters(prev => ({
@@ -228,8 +243,8 @@ const PackageListingPage: React.FC = () => {
                     setFilters({
                       priceRange: [0, 500000],
                       duration: [1, 14],
+                      travelTheme:[],
                       rating: null,
-                      amenities: [],
                       inclusions: []
                     });
                     setSearchQuery('');

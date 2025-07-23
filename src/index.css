@@ -90,6 +90,13 @@
   @apply transition-transform duration-300 hover:scale-105;
 }
 
+.swiper-button-next,
+.swiper-button-prev {
+  color: white;
+  z-index: 10;
+}
+
+
 .parallax-bg {
   background-attachment: fixed;
   background-position: center;
