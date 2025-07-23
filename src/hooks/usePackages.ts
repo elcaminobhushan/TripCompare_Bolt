@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConnected } from '../lib/supabase';
 import type { Package } from '../types';
 import { packages as localPackages } from '../data/packages';
+import { dataCache } from '../lib/cache';
 
 // ✅ Utility to transform DB package into frontend-friendly type
 const transformPackage = (pkg: any): Package => ({
@@ -35,8 +36,19 @@ export function usePackages() {
     async function fetchPackages() {
       try {
         setIsLoading(true);
+        
+        // Check cache first
+        const cacheKey = 'packages_all';
+        const cachedData = dataCache.get<Package[]>(cacheKey);
+        if (cachedData) {
+          setData(cachedData);
+          setIsLoading(false);
+          return;
+        }
+        
         if (!isSupabaseConnected()) {
           setData(localPackages);
+          dataCache.set(cacheKey, localPackages);
           setIsLoading(false);
           return;
         }
@@ -45,10 +57,12 @@ export function usePackages() {
         if (error) throw error;
         const transformed = packages.map(transformPackage);
         setData(transformed);
+        dataCache.set(cacheKey, transformed);
       } catch (err) {
         console.error('Error fetching packages:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
         setData(localPackages);
+        dataCache.set('packages_all', localPackages);
       } finally {
         setIsLoading(false);
       }
@@ -72,9 +86,20 @@ export function usePackage(id: string) {
     async function fetchPackage() {
       try {
         setIsLoading(true);
+        
+        // Check cache first
+        const cacheKey = `package_${id}`;
+        const cachedData = dataCache.get<Package>(cacheKey);
+        if (cachedData) {
+          setData(cachedData);
+          setIsLoading(false);
+          return;
+        }
+        
         if (!isSupabaseConnected()) {
           const pkg = localPackages.find(p => p.id === id);
           setData(pkg || null);
+          if (pkg) dataCache.set(cacheKey, pkg);
           setIsLoading(false);
           return;
         }
@@ -89,9 +114,15 @@ export function usePackage(id: string) {
 
         if (error) throw error;
         setData(transformPackage(pkg));
+        dataCache.set(cacheKey, transformPackage(pkg));
       } catch (err) {
         console.error('Error fetching package:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
+        const fallbackPkg = localPackages.find(p => p.id === id);
+        if (fallbackPkg) {
+          setData(fallbackPkg);
+          dataCache.set(`package_${id}`, fallbackPkg);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -112,6 +143,15 @@ export function useRelatedPackages(id: string, limit = 3) {
     async function fetchRelatedPackages() {
       try {
         setIsLoading(true);
+        
+        // Check cache first
+        const cacheKey = `related_packages_${id}_${limit}`;
+        const cachedData = dataCache.get<Package[]>(cacheKey);
+        if (cachedData) {
+          setData(cachedData);
+          setIsLoading(false);
+          return;
+        }
 
         const { data: current, error: err1 } = await supabase
           .from('packages')
@@ -134,9 +174,19 @@ export function useRelatedPackages(id: string, limit = 3) {
 
         const transformed = related.map(transformPackage);
         setData(transformed);
+        dataCache.set(cacheKey, transformed);
       } catch (err) {
         console.error('Error fetching related packages:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
+        // Fallback to local data
+        const currentPkg = localPackages.find(p => p.id === id);
+        if (currentPkg) {
+          const related = localPackages
+            .filter(p => p.id !== id && p.destinationId === currentPkg.destinationId)
+            .slice(0, limit);
+          setData(related);
+          dataCache.set(`related_packages_${id}_${limit}`, related);
+        }
       } finally {
         setIsLoading(false);
       }

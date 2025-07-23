@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, isSupabaseConnected } from '../lib/supabase';
 import type { Destination } from '../types';
 import { destinations as localDestinations } from '../data/destinations';
+import { dataCache } from '../lib/cache';
 
 
 export function useDestinations() {
@@ -14,9 +15,19 @@ export function useDestinations() {
       try {
         setIsLoading(true);
         
+        // Check cache first
+        const cacheKey = 'destinations_all';
+        const cachedData = dataCache.get<Destination[]>(cacheKey);
+        if (cachedData) {
+          setData(cachedData);
+          setIsLoading(false);
+          return;
+        }
+        
         // If Supabase is not connected, use local data
         if (!isSupabaseConnected()) {
           setData(localDestinations);
+          dataCache.set(cacheKey, localDestinations);
           return;
         }
         
@@ -43,11 +54,13 @@ export function useDestinations() {
         }));
 
         setData(transformedDestinations);
+        dataCache.set(cacheKey, transformedDestinations);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An unknown error occurred'));
         console.error('Error fetching destinations:', err);
         // Fallback to local data on error
         setData(localDestinations);
+        dataCache.set('destinations_all', localDestinations);
       } finally {
         setIsLoading(false);
       }
@@ -72,11 +85,21 @@ export function useDestination(_id: string) {
       try {
         setIsLoading(true);
         
+        // Check cache first
+        const cacheKey = `destination_${_id}`;
+        const cachedData = dataCache.get<Destination>(cacheKey);
+        if (cachedData) {
+          setData(cachedData);
+          setIsLoading(false);
+          return;
+        }
+        
         // If Supabase is not connected, use local data
         if (!isSupabaseConnected()) {
           const destination = localDestinations.find(d => d.id === _id);
           if (destination) {
             setData(destination);
+            dataCache.set(cacheKey, destination);
           }
           return;
         }

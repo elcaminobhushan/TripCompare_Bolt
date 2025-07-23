@@ -66,7 +66,7 @@ const Header: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6">
             <Link 
               to="/" 
               className={`font-medium hover:text-primary-600 transition-colors ${
@@ -97,7 +97,7 @@ const Header: React.FC = () => {
                 location.pathname === '/partners' ? 'text-primary-600' : 'text-gray-700'
               }`}
             >
-              Our Partners
+              Partners
             </Link>
             <Link 
               to="/about" 
@@ -105,7 +105,7 @@ const Header: React.FC = () => {
                 location.pathname === '/about' ? 'text-primary-600' : 'text-gray-700'
               }`}
             >
-              About Us
+              About
             </Link>
             <Link 
               to="/contact" 
@@ -113,12 +113,12 @@ const Header: React.FC = () => {
                 location.pathname === '/contact' ? 'text-primary-600' : 'text-gray-700'
               }`}
             >
-              Contact Us
+              Contact
             </Link>
           </nav>
 
           {/* Right Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-3">
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-700">{user.email}</span>
@@ -149,7 +149,7 @@ const Header: React.FC = () => {
             </Link>
             <Link 
               to="/packages" 
-              className="btn-primary"
+              className="btn-primary px-4 py-2"
             >
               Find Packages
             </Link>
@@ -157,7 +157,7 @@ const Header: React.FC = () => {
 
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-gray-700"
+            className="lg:hidden text-gray-700 p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -172,7 +172,7 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 py-4 px-4 shadow-lg">
+        <div className="lg:hidden bg-white border-t border-gray-200 py-4 px-4 shadow-lg max-h-screen overflow-y-auto">
           <nav className="flex flex-col space-y-4">
             <Link 
               to="/" 
@@ -212,7 +212,7 @@ const Header: React.FC = () => {
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              Our Partners
+              Partners
             </Link>
             <Link 
               to="/about" 
@@ -222,7 +222,7 @@ const Header: React.FC = () => {
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              About Us
+              About
             </Link>
             <Link 
               to="/contact" 
@@ -232,7 +232,7 @@ const Header: React.FC = () => {
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              Contact Us
+              Contact
             </Link>
             <Link 
               to="/favorites" 
@@ -244,6 +244,12 @@ const Header: React.FC = () => {
             >
               <Heart className={`h-5 w-5 ${favorites.length > 0 ? 'fill-accent-500 text-accent-500' : ''}`} />
               Favorites {favorites.length > 0 && `(${favorites.length})`}
+            </Link>
+            <Link 
+              to="/packages" 
+              className="btn-primary w-full text-center py-3 mt-4"
+            >
+              Find Packages
             </Link>
           </nav>
           {user ? (

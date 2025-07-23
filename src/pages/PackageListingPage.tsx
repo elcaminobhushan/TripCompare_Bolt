@@ -184,9 +184,9 @@ const PackageListingPage: React.FC = () => {
       />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Filters Sidebar */}
-          <div className="col-span-12 lg:col-span-3">
+          <div className="lg:col-span-3">
             <PackageFilters
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -205,7 +205,7 @@ const PackageListingPage: React.FC = () => {
           </div>
 
           {/* Package Listings */}
-          <div className="col-span-12 lg:col-span-9">
+          <div className="lg:col-span-9">
             <PackageSort
               sortOption={sortOption}
               onSortChange={setSortOption}
@@ -224,7 +224,7 @@ const PackageListingPage: React.FC = () => {
 
             {/* Package Grid */}
             {sortedPackages.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {sortedPackages.map((packageItem) => (
                   <PackageCard
                     key={packageItem.id}
