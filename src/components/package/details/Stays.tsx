@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Package } from '../../../types';
 import { ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { usePackageItinerary } from '../../../hooks/useItineraries';
-import { useAccommodationsByItineraryId } from '../../../hooks/useAccommodations';
+import { useAccommodationsByItineraryId,useAccommodationsByItineraryIds } from '../../../hooks/useAccommodations';
 
 interface StaysProps {
   packageData: Package;
@@ -13,21 +13,27 @@ const Stays: React.FC<StaysProps> = ({ packageData }) => {
   const { data: itinerary } = usePackageItinerary(packageData.id);
 
   const handleDayToggle = (day: number) => {
-    setExpandedDays(prev => 
-      prev.includes(day) 
+    setExpandedDays(prev =>
+      prev.includes(day)
         ? prev.filter(d => d !== day)
         : [...prev, day]
     );
   };
 
+  // Check if no accommodation data is present globally
+  const hasAnyAccommodations = useAccommodationsByItineraryIds(itinerary.map(a=>a.id));
 
-  if (!itinerary) {
-    return <div className="text-gray-500">No accommodation information available.</div>;
+  if (!itinerary || itinerary.length === 0) {
+    return <div className="text-gray-500">No itinerary found for this package.</div>;
+  }
+
+  if (!hasAnyAccommodations) {
+    return <div className="text-gray-500">The tour operator hasn't provided any stay information yet.</div>;
   }
 
   return (
     <div className="space-y-6">
-      {itinerary?.map((day) => (
+      {itinerary.map((day) => (
         <StaysDayCard
           key={day.day}
           day={day}
@@ -40,7 +46,7 @@ const Stays: React.FC<StaysProps> = ({ packageData }) => {
   );
 };
 
-// Separate component for each day to handle hooks properly
+// Inline component restored here
 const StaysDayCard: React.FC<{
   day: any;
   itineraryLength: number;
@@ -53,7 +59,7 @@ const StaysDayCard: React.FC<{
 
   const renderStarRating = (rating: number) => {
     if (!rating || rating <= 0) return null;
-    
+
     return [...Array(Math.floor(rating))].map((_, i) => (
       <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
     ));

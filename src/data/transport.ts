@@ -6,6 +6,8 @@ interface Transport {
   itenaryId : string;
   type: 'flight' | 'train' | 'bus' |'boat' | 'car';
   name: string;
+  source: string;
+  destination: string;
   description: string;
 }
 
@@ -15,6 +17,8 @@ export const transport: Transport[] = [
       itenaryId : "itin1_d1",
       type: "flight",
       name: "International Flight",
+      source: "Delhi",
+      destination : "Krabi",
       description: "Round-trip international flight up to INR 25,000 included in the package"
     }
   

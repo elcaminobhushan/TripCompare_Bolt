@@ -9,6 +9,8 @@ interface Transport {
   itenaryId: string;
   type: 'flight' | 'train' | 'bus' | 'boat' | 'car';
   name: string;
+  source: string;
+  destination: string;
   description: string;
 }
 
@@ -40,6 +42,8 @@ export function useTransport() {
           itenaryId: t.itenary_id || '',
           type: t.type,
           name: t.name,
+          source : t.source,
+          destination : t.destination,
           description: t.description
         }));
 
@@ -95,6 +99,8 @@ export function useTransportByItineraryId(itenaryId: string) {
           itenaryId: t.itenary_id || '',
           type: t.type,
           name: t.name,
+          source : t.source,
+          destination : t.destination,
           description: t.description
         }));
 
@@ -115,4 +121,58 @@ export function useTransportByItineraryId(itenaryId: string) {
     fetchTransport();
   }, [itenaryId]);
   return { data: data as TransportType[], isLoading, error };
+}
+
+export function useTransportByItineraryIds(itineraryIds: string[]) {
+  const [data, setData] = useState<TransportType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!itineraryIds || itineraryIds.length === 0) return;
+
+    async function fetchTransport() {
+      try {
+        setIsLoading(true);
+
+        // Local fallback
+        if (!isSupabaseConnected()) {
+          const filtered = localTransport.filter(t => itineraryIds.includes(t.itenaryId));
+          setData(filtered);
+          return;
+        }
+
+        const { data: transport, error } = await supabase
+          .from('transport')
+          .select('*')
+          .in('itenary_id', itineraryIds); // ✅ use `.in()` for multiple IDs
+
+        if (error) throw error;
+
+        const transformed = transport.map(t => ({
+          id: t.id,
+          itenaryId: t.itenary_id || '',
+          type: t.type,
+          name: t.name,
+          source: t.source,
+          destination: t.destination,
+          description: t.description,
+        }));
+
+        setData(transformed);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+        console.error('Error fetching transport:', err);
+
+        const fallback = localTransport.filter(t => itineraryIds.includes(t.itenaryId));
+        setData(fallback);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchTransport();
+  }, [itineraryIds]);
+
+  return { data, isLoading, error };
 }

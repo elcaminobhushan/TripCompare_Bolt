@@ -65,6 +65,8 @@ export interface Transport {
   itenaryId: string;
   type: string;
   name: string;
+  source: string;
+  destination: string;
   description: string;
 }
 

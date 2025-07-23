@@ -35,9 +35,9 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews }) => {
             </div>
             <p className="text-gray-600 mt-1">Based on {reviews.length} reviews</p>
           </div>
-          <div className="flex items-center justify-end">
+          {/* <div className="flex items-center justify-end">
             <button className="btn btn-primary">Write a Review</button>
-          </div>
+          </div> */}
         </div>
       </div>
 
